@@ -108,6 +108,15 @@
                     </VerticalStackLayout>
                 </Grid>
 
+                <Border x:Name="FotoBorde" IsVisible="False" StrokeThickness="0" Padding="0" HeightRequest="120">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Image x:Name="FotoImage" Aspect="AspectFill" />
+                </Border>
+
+                <Label x:Name="DescripcionLabel" IsVisible="False" Style="{StaticResource BogoBodySm}" />
+
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                     <VerticalStackLayout Grid.Column="0">
                         <Label x:Name="Detalle1Titulo" Style="{StaticResource BogoLabel}" />

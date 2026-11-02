@@ -7,6 +7,7 @@ using Mapsui.UI.Maui;
 
 namespace BogoMaps.Pages;
 
+[QueryProperty(nameof(PuntoId), "puntoId")]
 public partial class ExplorarPage : ContentPage
 {
     // Centro aproximado de la zona con más puntos (Chapinero) y resolución inicial del mapa.
@@ -17,10 +18,11 @@ public partial class ExplorarPage : ContentPage
     // Si el usuario está más lejos que esto de cualquier punto, asumimos que no está en Bogotá.
     private const double DistanciaMaximaKm = 30;
 
-    private readonly PuntosService _puntosService = new();
     private IReadOnlyList<PuntoUrbano> _puntos = [];
     private CategoriaPunto? _categoriaActiva;
-    private bool _cargado;
+
+    /// <summary>Id del punto a enfocar al llegar desde otra pantalla (p. ej. un reporte recién publicado).</summary>
+    public string? PuntoId { get; set; }
 
     public ExplorarPage()
     {
@@ -49,13 +51,22 @@ public partial class ExplorarPage : ContentPage
     {
         base.OnAppearing();
 
-        if (_cargado)
-            return;
-
-        _cargado = true;
-        _puntos = await _puntosService.ObtenerAsync();
+        // Se recarga en cada visita para incluir los reportes publicados desde la pestaña Reportar.
+        _puntos = await PuntosService.Compartido.ObtenerAsync();
         TodosLabel.Text = $"Todos ({_puntos.Count})";
         ActualizarPines();
+
+        if (PuntoId is not null)
+        {
+            var id = PuntoId;
+            PuntoId = null;
+
+            if (_puntos.FirstOrDefault(p => p.Id.ToString() == id) is { } enfocado)
+            {
+                CentrarEn(enfocado.Latitud, enfocado.Longitud, 6);
+                MostrarPunto(enfocado);
+            }
+        }
     }
 
     private static Color Res(string key) => (Color)Application.Current!.Resources[key];
@@ -133,8 +144,17 @@ public partial class ExplorarPage : ContentPage
 
         TituloLabel.Text = p.Titulo;
         UbicacionLabel.Text = p.Ubicacion;
-        CalificacionLabel.Text = $"★ {p.Calificacion:0.0}";
-        ConfirmacionesLabel.Text = $"{p.Confirmaciones} peatones";
+        // Un reporte nuevo aún no tiene calificación ni confirmaciones.
+        CalificacionLabel.Text = p.Calificacion > 0 ? $"★ {p.Calificacion:0.0}" : "Nuevo";
+        ConfirmacionesLabel.Text = p.Confirmaciones > 0 ? $"{p.Confirmaciones} peatones" : "Sin confirmar";
+
+        DescripcionLabel.Text = p.Descripcion;
+        DescripcionLabel.IsVisible = !string.IsNullOrWhiteSpace(p.Descripcion);
+
+        var rutaFoto = p.FotoArchivo is null ? null : PuntosService.RutaFoto(p.FotoArchivo);
+        var hayFoto = rutaFoto is not null && File.Exists(rutaFoto);
+        FotoImage.Source = hayFoto ? ImageSource.FromFile(rutaFoto) : null;
+        FotoBorde.IsVisible = hayFoto;
 
         MostrarDetalle(Detalle1Titulo, Detalle1Valor, p.Detalles.ElementAtOrDefault(0));
         MostrarDetalle(Detalle2Titulo, Detalle2Valor, p.Detalles.ElementAtOrDefault(1));

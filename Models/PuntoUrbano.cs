@@ -33,4 +33,9 @@ public class PuntoUrbano
     public double Calificacion { get; set; }
     public int Confirmaciones { get; set; }
     public List<DetallePunto> Detalles { get; set; } = [];
+
+    // Solo los reportes creados por usuarios traen estos campos.
+    public string Descripcion { get; set; } = "";
+    public string? FotoArchivo { get; set; }
+    public DateTime? FechaReporte { get; set; }
 }
