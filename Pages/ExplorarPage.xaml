@@ -15,37 +15,37 @@
        <Grid ColumnDefinitions="30,*,Auto" ColumnSpacing="4">
         <Image Source="ui_search.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
         <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Buscar calle, barrio o punto…" FontFamily="JakartaRegular" FontSize="12" TextChanged="OnSearchChanged"  TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"/>
-        <Button Grid.Column="2" Text="Cerca de mí" FontSize="11" HeightRequest="42" Padding="10,0" CornerRadius="12" BackgroundColor="{StaticResource PrimaryFixed}" TextColor="{StaticResource BrandPrimaryDark}" Clicked="OnNearMeClicked" />
+        <Button Grid.Column="2" ImageSource="ui_location_blue.png" ContentLayout="Left,4" Text="Cerca de mí" FontSize="11" HeightRequest="42" Padding="10,0" CornerRadius="12" BackgroundColor="{StaticResource PrimaryFixed}" TextColor="{StaticResource BrandPrimaryDark}" Clicked="OnNearMeClicked" />
        </Grid>
       </Border>
       <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
        <HorizontalStackLayout x:Name="FilterChips" Spacing="6">
         <Border Style="{StaticResource BogoChip}" Padding="12,7" BackgroundColor="{StaticResource BrandPrimary}">
-         <Label Text="Todos" Style="{StaticResource BogoLabel}" TextColor="White" />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_compass_white.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Todos" Style="{StaticResource BogoLabel}" TextColor="White" /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Iluminación" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_light_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Accesibilidad" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_access_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Aceras" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_path_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Aceras" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Cruces" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_warning_red.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Cruces" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Obras" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_tools_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Obras" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
         <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <Label Text="Punto seguro" Style="{StaticResource BogoLabel}"  />
+         <HorizontalStackLayout Spacing="6"><Image Source="ui_shield_green.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Punto seguro" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
          <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
         </Border>
        </HorizontalStackLayout>
@@ -59,7 +59,15 @@
     <Border Style="{StaticResource BogoCard}" Margin="12,-28,12,0" Padding="16" ZIndex="2">
      <VerticalStackLayout Spacing="10">
       <BoxView HeightRequest="4" WidthRequest="40" Color="{StaticResource PrimaryFixed}" HorizontalOptions="Center" />
-      <Label x:Name="SelectedStatus" Text="TU RED PEATONAL" FontFamily="InterSemiBold" FontSize="11" TextColor="{StaticResource BrandSecondary}" />
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+       <ui:IconBadge x:Name="SelectedIcon" Icon="ui_compass" Tone="Blue" />
+       <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+        <Border x:Name="SelectedBadge" BackgroundColor="{StaticResource PrimaryFixed}" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start">
+         <Label x:Name="SelectedStatus" Text="TU RED PEATONAL" FontFamily="InterSemiBold" FontSize="10" TextColor="{StaticResource BrandPrimaryDark}" />
+        </Border>
+        <Label x:Name="SelectedUpdated" Text="Bogotá D.C." Style="{StaticResource BogoBodySm}" FontSize="10" />
+       </VerticalStackLayout>
+      </Grid>
       <Label x:Name="SelectedTitle" Text="Explora Bogotá a pie" Style="{StaticResource BogoH2}" />
       <Label x:Name="SelectedAddress" Text="Toca un reporte del mapa para consultar su estado, guardarlo o confirmarlo." Style="{StaticResource BogoBodySm}" />
       <Image x:Name="SelectedPhoto" Aspect="AspectFill" HeightRequest="130" IsVisible="False" />

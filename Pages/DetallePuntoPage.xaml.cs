@@ -1,3 +1,4 @@
+using BogoMaps.Controls;
 using BogoMaps.Models;
 using BogoMaps.Services;
 namespace BogoMaps.Pages;
@@ -28,6 +29,11 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
         PavementValue.Text = report.Pavement;
         AccessibilityValue.Text = report.Accessibility;
         NoiseValue.Text = report.Noise;
+        ApplyAssessment(LightingBadge, LightingValue, report.Lighting);
+        ApplyAssessment(PavementBadge, PavementValue, report.Pavement);
+        ApplyAssessment(AccessibilityBadge, AccessibilityValue, report.Accessibility);
+        ApplyAssessment(NoiseBadge, NoiseValue, report.Noise);
+        GuardarBtn.ImageSource = report.Saved ? "ui_save_green.png" : "ui_save_blue.png";
         DetailsLabel.Text = $"Creado: {report.CreatedAt.ToLocalTime():g}\n{(report.Anonymous ? "Anónimo" : "Reporte local")}\nCoordenadas: {report.Latitude:F6}, {report.Longitude:F6}" +
             (report.ConfirmedAt.HasValue ? $"\nConfirmado en este dispositivo: {report.ConfirmedAt.Value.ToLocalTime():g}" : "");
         GuardarBtn.Text = report.Saved ? "Quitar de guardados" : "Guardar punto";
@@ -38,6 +44,12 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
         PhotoImage.Source = PhotoImage.IsVisible ? report.Photo : null;
         NoPhoto.IsVisible = !PhotoImage.IsVisible;
         EvidenceLabel.Text = PhotoImage.IsVisible ? "Foto adjunta al reporte, visible en la cabecera." : "Este reporte todavía no tiene una foto adjunta.";
+    }
+    private static void ApplyAssessment(Border badge, Label label, string value)
+    {
+        var tone = CivicVisuals.Assessment(value);
+        badge.BackgroundColor = CivicVisuals.Surface(tone);
+        label.TextColor = CivicVisuals.Ink(tone);
     }
     private async Task UpdateAsync(Action<PedestrianReport> change)
     {

@@ -29,6 +29,7 @@ public sealed class BottomNavigation : ContentView
         foreach (var button in buttons)
         {
             var selected = (string)button.CommandParameter == activeTab;
+            button.ImageSource = $"tab_{button.CommandParameter}{(selected ? "_active" : "")}.png";
             button.TextColor = Color.FromArgb(selected ? "#004AC6" : "#737686");
             button.BackgroundColor = selected ? Color.FromArgb("#EAEDFF") : Colors.Transparent;
             SemanticProperties.SetDescription(button, selected ? $"{button.Text}, pestaña actual" : button.Text);

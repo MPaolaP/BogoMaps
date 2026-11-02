@@ -1,3 +1,4 @@
+using BogoMaps.Controls;
 using BogoMaps.Models;
 using BogoMaps.Services;
 using Mapsui;
@@ -85,6 +86,12 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         SelectedTitle.Text = report?.Description ?? "Explora Bogotá a pie";
         SelectedAddress.Text = report?.Address ?? "Todavía no hay reportes en esta selección. Añade un punto para empezar.";
         SelectedStatus.Text = report == null ? "TU RED PEATONAL" : $"{report.Category.ToUpperInvariant()} · {(report.Resolved ? "RESUELTO" : "ACTIVO")}";
+        var appearance = report == null ? (Icon: "ui_compass", Tone: CivicTone.Blue) : CivicVisuals.Category(report.Category);
+        SelectedIcon.SetAppearance(appearance.Icon, appearance.Tone);
+        var stateTone = report == null ? CivicTone.Blue : CivicVisuals.State(report.Resolved, report.Severity);
+        SelectedBadge.BackgroundColor = CivicVisuals.Surface(stateTone);
+        SelectedStatus.TextColor = CivicVisuals.Ink(stateTone);
+        SelectedUpdated.Text = report == null ? "Bogotá D.C." : $"Reportado el {report.CreatedAt.ToLocalTime():dd MMM · HH:mm}";
         SelectedAction.Text = report == null ? "Crear un reporte" : "Ver estado del punto →";
         SelectedPhoto.IsVisible = report?.Photo != null && File.Exists(report.Photo);
         SelectedPhoto.Source = SelectedPhoto.IsVisible ? report!.Photo : null;
@@ -108,7 +115,13 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         {
             var selected = child == selectedChip;
             child.BackgroundColor = (Microsoft.Maui.Graphics.Color)Application.Current!.Resources[selected ? "BrandPrimary" : "SurfaceLowest"];
-            if (child.Content is Label label) label.TextColor = selected ? Colors.White : (Microsoft.Maui.Graphics.Color)Application.Current.Resources["OnSurface"];
+            if (child.Content is HorizontalStackLayout contents)
+            {
+                foreach (var label in contents.Children.OfType<Label>()) label.TextColor = selected ? Colors.White : CivicVisuals.Resource("OnSurface");
+                var index = FilterChips.Children.IndexOf(child);
+                var appearance = index == 0 ? (Icon: "ui_compass", Tone: CivicTone.Blue) : CivicVisuals.Category(new[] { "Todos", "Iluminación", "Accesibilidad", "Aceras", "Cruces", "Obras", "Punto seguro" }[index]);
+                foreach (var image in contents.Children.OfType<Microsoft.Maui.Controls.Image>()) image.Source = selected ? $"{appearance.Icon}_white.png" : CivicVisuals.IconSource(appearance.Icon, appearance.Tone);
+            }
         }
     }
     private async void OnNearMeClicked(object? sender, EventArgs e)

@@ -17,15 +17,15 @@
       <Label Text="Comunidad caminante · Bogotá D.C." Style="{StaticResource BogoBodySm}" FontSize="11" HorizontalTextAlignment="Center" />
       <BoxView WidthRequest="26" HeightRequest="4" Color="{StaticResource SecondaryContainer}" HorizontalOptions="Center" />
       <Label x:Name="BioLabel" Style="{StaticResource BogoBodySm}" HorizontalTextAlignment="Center" Margin="0,4" />
-      <Button Text="Editar perfil" Clicked="OnEditClicked" Style="{StaticResource BogoSecondaryButton}" HorizontalOptions="Center" Padding="24,0" />
-      <Button Text="Cambiar foto" Clicked="OnAvatarClicked" FontSize="11" BackgroundColor="Transparent" TextColor="{StaticResource BrandPrimary}" HorizontalOptions="Center" />
+      <Button ImageSource="ui_edit_blue.png" ContentLayout="Left,8" Text="Editar perfil" Clicked="OnEditClicked" Style="{StaticResource BogoSecondaryButton}" HorizontalOptions="Center" Padding="24,0" />
+      <Button ImageSource="ui_camera_blue.png" ContentLayout="Left,6" Text="Cambiar foto" Clicked="OnAvatarClicked" FontSize="11" BackgroundColor="Transparent" TextColor="{StaticResource BrandPrimary}" HorizontalOptions="Center" />
      </VerticalStackLayout>
     </Border>
     <VerticalStackLayout Spacing="10">
      <Label Text="Impacto ciudadano" Style="{StaticResource BogoH2}" />
      <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-      <Border Grid.Column="0" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><Image Source="ui_flag.png" WidthRequest="26" HeightRequest="26" HorizontalOptions="Start" /><Label x:Name="ReportCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Reportes creados" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
-      <Border Grid.Column="1" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><Image Source="ui_check.png" WidthRequest="26" HeightRequest="26" HorizontalOptions="Start" /><Label x:Name="ConfirmationCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Confirmaciones locales" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+      <Border Grid.Column="0" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_flag" Tone="Blue" /><Label x:Name="ReportCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Reportes creados" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+      <Border Grid.Column="1" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_check" Tone="Green" /><Label x:Name="ConfirmationCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Confirmaciones locales" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
      </Grid>
     </VerticalStackLayout>
     <Border StrokeThickness="0" StrokeShape="RoundRectangle 16" BackgroundColor="{StaticResource SurfaceContainer}" Padding="4">

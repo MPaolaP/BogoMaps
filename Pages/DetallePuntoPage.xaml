@@ -15,8 +15,8 @@
       <Label Text="Sin evidencia fotográfica" Style="{StaticResource BogoBodySm}" />
      </VerticalStackLayout>
      <Grid Padding="12" ColumnDefinitions="*,Auto" VerticalOptions="Start">
-      <Button Text="← Ver en mapa" Clicked="OnViewMapClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" HorizontalOptions="Start" BackgroundColor="{StaticResource Surface}" />
-      <Button Grid.Column="1" x:Name="GuardarBtn" Clicked="OnGuardarClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" BackgroundColor="{StaticResource Surface}" />
+      <Button ImageSource="tab_explorar_active.png" ContentLayout="Left,6" Text="Ver en mapa" Clicked="OnViewMapClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" HorizontalOptions="Start" BackgroundColor="{StaticResource Surface}" />
+      <Button Grid.Column="1" ImageSource="ui_save_blue.png" ContentLayout="Left,6" x:Name="GuardarBtn" Clicked="OnGuardarClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" BackgroundColor="{StaticResource Surface}" />
      </Grid>
      <Border VerticalOptions="End" BackgroundColor="#C0131B2E" Padding="16,12,16,28" StrokeThickness="0">
       <VerticalStackLayout Spacing="4">
@@ -31,16 +31,16 @@
       <Label Text="Estado del punto" Style="{StaticResource BogoH2}" />
       <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
        <Border Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
-        <VerticalStackLayout Spacing="8"><Image Source="ui_light.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}" /><Label x:Name="LightingValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+        <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_light" Tone="Amber" WidthRequest="36" HeightRequest="36" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}" /><Border x:Name="LightingBadge" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start"><Label x:Name="LightingValue" FontFamily="JakartaBold" FontSize="13" TextColor="{StaticResource BrandPrimaryDark}" /></Border></VerticalStackLayout>
        </Border>
        <Border Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
-        <VerticalStackLayout Spacing="8"><Image Source="ui_tools.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Pavimento" Style="{StaticResource BogoLabel}" /><Label x:Name="PavementValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+        <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_tools" Tone="Green" WidthRequest="36" HeightRequest="36" /><Label Text="Pavimento" Style="{StaticResource BogoLabel}" /><Border x:Name="PavementBadge" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start"><Label x:Name="PavementValue" FontFamily="JakartaBold" FontSize="13" TextColor="{StaticResource BrandPrimaryDark}" /></Border></VerticalStackLayout>
        </Border>
        <Border Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
-        <VerticalStackLayout Spacing="8"><Image Source="ui_access.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" /><Label x:Name="AccessibilityValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+        <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_access" Tone="Blue" WidthRequest="36" HeightRequest="36" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" /><Border x:Name="AccessibilityBadge" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start"><Label x:Name="AccessibilityValue" FontFamily="JakartaBold" FontSize="13" TextColor="{StaticResource BrandPrimaryDark}" /></Border></VerticalStackLayout>
        </Border>
        <Border Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
-        <VerticalStackLayout Spacing="8"><Image Source="ui_noise.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Tráfico y ruido" Style="{StaticResource BogoLabel}" /><Label x:Name="NoiseValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+        <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_noise" Tone="Blue" WidthRequest="36" HeightRequest="36" /><Label Text="Tráfico y ruido" Style="{StaticResource BogoLabel}" /><Border x:Name="NoiseBadge" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start"><Label x:Name="NoiseValue" FontFamily="JakartaBold" FontSize="13" TextColor="{StaticResource BrandPrimaryDark}" /></Border></VerticalStackLayout>
        </Border>
       </Grid>
       <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
@@ -52,7 +52,7 @@
        <VerticalStackLayout Spacing="10">
         <Label Text="¿Estás en este punto?" Style="{StaticResource BogoH2}" />
         <Label Text="Tu confirmación queda guardada en este dispositivo. No certifica la seguridad de una ruta." Style="{StaticResource BogoBodySm}" />
-        <Button x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
+        <Button ImageSource="ui_check_white.png" ContentLayout="Left,8" x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
         <Button x:Name="ResolvedBtn" Clicked="OnResolvedClicked" Style="{StaticResource BogoSecondaryButton}" BackgroundColor="White" />
        </VerticalStackLayout>
       </Border>

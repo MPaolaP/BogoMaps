@@ -1,3 +1,4 @@
+using BogoMaps.Controls;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
@@ -62,7 +63,8 @@ public partial class ReportarPage : BogoMaps.Controls.StitchPage
             {
                 foreach (var label in content.Children.OfType<Label>()) label.TextColor = selected ? Colors.White : Res("OnSurface");
                 var index = CategoriaGrid.Children.IndexOf(child);
-                foreach (var image in content.Children.OfType<Image>()) image.Source = new[] { "ui_path", "ui_light", "ui_access", "ui_warning", "ui_tools", "ui_shield" }[index] + (selected ? "_white.png" : ".png");
+                var appearance = CivicVisuals.Category(new[] { "Aceras", "Iluminación", "Accesibilidad", "Cruces", "Obras", "Punto seguro" }[index]);
+                foreach (var image in content.Children.OfType<Image>()) image.Source = selected ? $"{appearance.Icon}_white.png" : CivicVisuals.IconSource(appearance.Icon, appearance.Tone);
             }
         }
     }

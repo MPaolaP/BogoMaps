@@ -24,7 +24,7 @@
                        Style="{StaticResource BogoBodySm}" />
             </VerticalStackLayout>
 
-            <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}"><HorizontalStackLayout Spacing="10"><Image Source="ui_shield.png" WidthRequest="24" HeightRequest="24" /><Label x:Name="AuthorLabel" Style="{StaticResource BogoLabel}" VerticalOptions="Center" /></HorizontalStackLayout></Border>
+            <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}"><HorizontalStackLayout Spacing="10"><ui:IconBadge Icon="ui_shield" Tone="Green" /><Label x:Name="AuthorLabel" Style="{StaticResource BogoLabel}" VerticalOptions="Center" /></HorizontalStackLayout></Border>
             <!-- Ubicación -->
             <VerticalStackLayout Spacing="8">
                 <Label Text="Ubicación del incidente" Style="{StaticResource BogoLabel}" FontSize="14" />
@@ -39,7 +39,7 @@
                   </Border>
                  </Grid>
                 </Border>
-                <Button Text="Usar mi ubicación GPS actual"
+                <Button ImageSource="ui_location_blue.png" ContentLayout="Left,8" Text="Usar mi ubicación GPS actual"
                         Style="{StaticResource BogoSecondaryButton}"
                         TextColor="{StaticResource BrandPrimary}"
                         Clicked="OnGpsClicked" />
@@ -64,23 +64,23 @@
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
-                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_light.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Falta de iluminación" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
+                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_light_amber.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Falta de iluminación" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
-                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_access.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Rampa bloqueada / Inaccesible" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
+                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_access_blue.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Rampa bloqueada / Inaccesible" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
-                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_warning.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Cruce peatonal peligroso" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
+                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_warning_red.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Cruce peatonal peligroso" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
-                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_tools.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Obra en vía peatonal" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
+                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_tools_amber.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Obra en vía peatonal" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
-                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_shield.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Punto seguro / Recomendado" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
+                        <Grid RowDefinitions="30,*" RowSpacing="8"><Image Source="ui_shield_green.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Grid.Row="1" Text="Punto seguro / Recomendado" Style="{StaticResource BogoLabel}" FontSize="11" VerticalOptions="End" /></Grid>
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
                     </Border>
                 </Grid>
@@ -126,7 +126,7 @@
             <VerticalStackLayout Spacing="8">
                 <Label Text="Evidencia visual" Style="{StaticResource BogoLabel}" FontSize="14" />
                 <Image x:Name="PhotoPreview" HeightRequest="150" Aspect="AspectFill" IsVisible="False" />
-                <Button x:Name="PhotoButton" Text="Adjuntar foto" Style="{StaticResource BogoSecondaryButton}"
+                <Button ImageSource="ui_camera_blue.png" ContentLayout="Left,8" x:Name="PhotoButton" Text="Adjuntar foto" Style="{StaticResource BogoSecondaryButton}"
                         TextColor="{StaticResource BrandPrimary}" Clicked="OnFotoClicked" />
             </VerticalStackLayout>
 
