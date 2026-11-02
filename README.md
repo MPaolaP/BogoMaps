@@ -54,3 +54,13 @@ Android pide ubicación solo al pulsar GPS/Cerca de mí; las fotos se selecciona
 La compilación no demuestra que estos flujos de interfaz se hayan ejecutado. No hay emulador/dispositivo conectado en el entorno de implementación.
 
 Una futura fase comunitaria necesita backend, autorización, almacenamiento de fotos y sincronización. La autenticación Firebase no proporciona por sí sola esas capacidades. El modo local no simula esas capacidades.
+
+## Composición visual de Stitch
+
+Las pantallas de Explorar, Detalle, Reportar, Guardados y Perfil usan `Controls/StitchPage`: un marco móvil de hasta 440 unidades, centrado en ventanas Windows y ajustado al ancho disponible en teléfonos. La cabecera y la navegación inferior son controles MAUI compartidos; se ocultan las barras Shell duplicadas.
+
+Explorar conserva el mapa, filtros, zoom y una tarjeta del punto seleccionado. El botón «Ver en mapa» del detalle vuelve al marcador correspondiente. Reportar permite tocar el mapa para ubicar el incidente; las coordenadas manuales siguen disponibles como alternativa. Las fotos adjuntas tienen previsualización. Perfil muestra avatar editable y contadores calculados sobre los reportes de la cuenta actual.
+
+Las tarjetas de iluminación, pavimento, accesibilidad y ruido se alimentan de la evaluación opcional del formulario. Los registros anteriores muestran «Sin evaluar», sin inventar porcentajes. Las fotografías del mockup y sus cifras comunitarias no se cargan como si fueran datos reales; se muestran las fotos y aportes guardados por la persona.
+
+Validación visual pendiente en Windows: revisar a distintos tamaños de ventana, con escalado de pantalla y texto, desplazamiento del mapa y del formulario, navegación inferior, reportes con/sin foto y todas las pestañas de Perfil. El entorno Linux puede compilar Android y ejecutar las pruebas del modelo, pero no capturar las pantallas nativas de Windows.

@@ -1,6 +1,6 @@
 using BogoMaps.Services;
 namespace BogoMaps.Pages;
-public partial class GuardadosPage : ContentPage
+public partial class GuardadosPage : BogoMaps.Controls.StitchPage
 {
     public GuardadosPage() => InitializeComponent();
     protected override async void OnAppearing()

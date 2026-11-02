@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BogoMaps.Pages.GuardadosPage" Title="Guardados" BackgroundColor="{StaticResource Surface}">
-<ScrollView><VerticalStackLayout Padding="16" Spacing="20">
-<Label Text="Mis puntos guardados" Style="{StaticResource BogoH1}" /><Label Text="Disponibles en este dispositivo" Style="{StaticResource BogoBodySm}" /><VerticalStackLayout x:Name="ReportList" Spacing="12" /></VerticalStackLayout></ScrollView></ContentPage>
+<ui:StitchPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+ xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+ xmlns:ui="clr-namespace:BogoMaps.Controls"
+ xmlns:maps="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+ x:Class="BogoMaps.Pages.GuardadosPage" Title="Guardados">
+ <Grid RowDefinitions="62,*,70" BackgroundColor="{StaticResource Surface}">
+  <ui:BrandHeader SectionTitle="Guardados" />
+  <ScrollView Grid.Row="1"><VerticalStackLayout Padding="16" Spacing="16">
+   <Label Text="Mis puntos guardados" Style="{StaticResource BogoH1}" />
+   <Label Text="Los lugares que quieres tener a mano para volver a caminar por Bogotá." Style="{StaticResource BogoBodySm}" />
+   <VerticalStackLayout x:Name="ReportList" Spacing="12" />
+  </VerticalStackLayout></ScrollView>
+  <ui:BottomNavigation Grid.Row="2" ActiveTab="guardados" />
+ </Grid>
+</ui:StitchPage>

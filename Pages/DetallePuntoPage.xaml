@@ -1,15 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BogoMaps.Pages.DetallePuntoPage" Title="Detalle del punto" BackgroundColor="{StaticResource Surface}">
-<ScrollView><VerticalStackLayout Padding="16" Spacing="20">
-<Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceHigh}"><VerticalStackLayout Spacing="12">
-<Label x:Name="ReportTitle" Style="{StaticResource BogoH1}" /><Label x:Name="AddressLabel" Style="{StaticResource BogoBody}" /><Label x:Name="StatusLabel" Style="{StaticResource BogoLabel}" />
-<Button x:Name="GuardarBtn" Clicked="OnGuardarClicked" Style="{StaticResource BogoSecondaryButton}" /></VerticalStackLayout></Border>
-<Image x:Name="PhotoImage" HeightRequest="240" Aspect="AspectFit" IsVisible="False" />
-<Label x:Name="DetailsLabel" Style="{StaticResource BogoBodySm}" />
-<Border Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="12"><Label Text="¿Estás en este punto?" Style="{StaticResource BogoH2}" />
-<Label Text="La confirmación se conserva en este dispositivo; no acredita seguridad ni verificación comunitaria." Style="{StaticResource BogoBodySm}" />
-<Button x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
-<Button x:Name="ResolvedBtn" Clicked="OnResolvedClicked" Style="{StaticResource BogoSecondaryButton}" />
-<Button Text="Abrir indicaciones" Clicked="OnDirectionsClicked" Style="{StaticResource BogoSecondaryButton}" />
-<Button Text="Reportar otro punto" Clicked="OnReportarCambioClicked" Style="{StaticResource BogoSecondaryButton}" />
-</VerticalStackLayout></Border></VerticalStackLayout></ScrollView></ContentPage>
+<ui:StitchPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+ xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+ xmlns:ui="clr-namespace:BogoMaps.Controls"
+ xmlns:maps="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+ x:Class="BogoMaps.Pages.DetallePuntoPage" Title="Detalle de incidencia">
+ <Grid RowDefinitions="62,*,70" BackgroundColor="{StaticResource Surface}">
+  <ui:BrandHeader SectionTitle="Detalle de incidencia" ShowBack="True" />
+  <ScrollView Grid.Row="1">
+   <VerticalStackLayout Spacing="0">
+    <Grid HeightRequest="270" BackgroundColor="{StaticResource SurfaceHigh}">
+     <Image x:Name="PhotoImage" Aspect="AspectFill" IsVisible="False" />
+     <VerticalStackLayout x:Name="NoPhoto" VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+      <Image Source="ui_camera.png" WidthRequest="40" HeightRequest="40" HorizontalOptions="Center" />
+      <Label Text="Sin evidencia fotográfica" Style="{StaticResource BogoBodySm}" />
+     </VerticalStackLayout>
+     <Grid Padding="12" ColumnDefinitions="*,Auto" VerticalOptions="Start">
+      <Button Text="← Ver en mapa" Clicked="OnViewMapClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" HorizontalOptions="Start" BackgroundColor="{StaticResource Surface}" />
+      <Button Grid.Column="1" x:Name="GuardarBtn" Clicked="OnGuardarClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="12" BackgroundColor="{StaticResource Surface}" />
+     </Grid>
+     <Border VerticalOptions="End" BackgroundColor="#C0131B2E" Padding="16,12,16,28" StrokeThickness="0">
+      <VerticalStackLayout Spacing="4">
+       <Label x:Name="StatusLabel" TextColor="{StaticResource SecondaryContainer}" FontFamily="InterSemiBold" FontSize="11" />
+       <Label x:Name="AddressLabel" TextColor="White" FontFamily="JakartaBold" FontSize="24" />
+       <Label x:Name="ReportTitle" TextColor="White" FontFamily="JakartaRegular" FontSize="13" />
+      </VerticalStackLayout>
+     </Border>
+    </Grid>
+    <Border BackgroundColor="{StaticResource Surface}" StrokeThickness="0" StrokeShape="RoundRectangle 24,24,0,0" Margin="0,-18,0,0" Padding="16,18" ZIndex="1">
+     <VerticalStackLayout Spacing="20">
+      <Label Text="Estado del punto" Style="{StaticResource BogoH2}" />
+      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+       <Border Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
+        <VerticalStackLayout Spacing="8"><Image Source="ui_light.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}" /><Label x:Name="LightingValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+       </Border>
+       <Border Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
+        <VerticalStackLayout Spacing="8"><Image Source="ui_tools.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Pavimento" Style="{StaticResource BogoLabel}" /><Label x:Name="PavementValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+       </Border>
+       <Border Grid.Row="1" Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
+        <VerticalStackLayout Spacing="8"><Image Source="ui_access.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" /><Label x:Name="AccessibilityValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+       </Border>
+       <Border Grid.Row="1" Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="14">
+        <VerticalStackLayout Spacing="8"><Image Source="ui_noise.png" WidthRequest="24" HeightRequest="24" HorizontalOptions="Start" /><Label Text="Tráfico y ruido" Style="{StaticResource BogoLabel}" /><Label x:Name="NoiseValue" FontFamily="JakartaBold" FontSize="16" TextColor="{StaticResource BrandPrimaryDark}" /></VerticalStackLayout>
+       </Border>
+      </Grid>
+      <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
+       <VerticalStackLayout Spacing="8"><Label Text="Información del reporte" Style="{StaticResource BogoLabel}" /><Label x:Name="DetailsLabel" Style="{StaticResource BogoBodySm}" /></VerticalStackLayout>
+      </Border>
+      <Label Text="Evidencia del lugar" Style="{StaticResource BogoH2}" />
+      <Label x:Name="EvidenceLabel" Style="{StaticResource BogoBodySm}" />
+      <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}">
+       <VerticalStackLayout Spacing="10">
+        <Label Text="¿Estás en este punto?" Style="{StaticResource BogoH2}" />
+        <Label Text="Tu confirmación queda guardada en este dispositivo. No certifica la seguridad de una ruta." Style="{StaticResource BogoBodySm}" />
+        <Button x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
+        <Button x:Name="ResolvedBtn" Clicked="OnResolvedClicked" Style="{StaticResource BogoSecondaryButton}" BackgroundColor="White" />
+       </VerticalStackLayout>
+      </Border>
+      <Button Text="Cómo llegar caminando →" Clicked="OnDirectionsClicked" Style="{StaticResource BogoSecondaryButton}" />
+      <Button Text="Reportar un cambio" Clicked="OnReportarCambioClicked" Style="{StaticResource BogoSecondaryButton}" />
+     </VerticalStackLayout>
+    </Border>
+   </VerticalStackLayout>
+  </ScrollView>
+  <ui:BottomNavigation Grid.Row="2" ActiveTab="explorar" />
+ </Grid>
+</ui:StitchPage>

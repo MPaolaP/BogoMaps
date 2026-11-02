@@ -9,6 +9,10 @@ public sealed class PedestrianReport
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public string Severity { get; set; } = "Moderado";
+    public string Lighting { get; set; } = "Sin evaluar";
+    public string Pavement { get; set; } = "Sin evaluar";
+    public string Accessibility { get; set; } = "Sin evaluar";
+    public string Noise { get; set; } = "Sin evaluar";
     public string? Photo { get; set; }
     public bool Anonymous { get; set; }
     public bool Saved { get; set; }

@@ -1,7 +1,7 @@
 using BogoMaps.Models;
 using BogoMaps.Services;
 namespace BogoMaps.Pages;
-public partial class DetallePuntoPage : ContentPage, IQueryAttributable
+public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttributable
 {
     private string? id;
     private PedestrianReport? report;
@@ -24,6 +24,10 @@ public partial class DetallePuntoPage : ContentPage, IQueryAttributable
         ReportTitle.Text = report.Description;
         AddressLabel.Text = report.Address;
         StatusLabel.Text = report.Summary;
+        LightingValue.Text = report.Lighting;
+        PavementValue.Text = report.Pavement;
+        AccessibilityValue.Text = report.Accessibility;
+        NoiseValue.Text = report.Noise;
         DetailsLabel.Text = $"Creado: {report.CreatedAt.ToLocalTime():g}\n{(report.Anonymous ? "Anónimo" : "Reporte local")}\nCoordenadas: {report.Latitude:F6}, {report.Longitude:F6}" +
             (report.ConfirmedAt.HasValue ? $"\nConfirmado en este dispositivo: {report.ConfirmedAt.Value.ToLocalTime():g}" : "");
         GuardarBtn.Text = report.Saved ? "Quitar de guardados" : "Guardar punto";
@@ -32,6 +36,8 @@ public partial class DetallePuntoPage : ContentPage, IQueryAttributable
         ResolvedBtn.Text = report.Resolved ? "Reabrir reporte" : "Marcar como resuelto";
         PhotoImage.IsVisible = report.Photo != null && File.Exists(report.Photo);
         PhotoImage.Source = PhotoImage.IsVisible ? report.Photo : null;
+        NoPhoto.IsVisible = !PhotoImage.IsVisible;
+        EvidenceLabel.Text = PhotoImage.IsVisible ? "Foto adjunta al reporte, visible en la cabecera." : "Este reporte todavía no tiene una foto adjunta.";
     }
     private async Task UpdateAsync(Action<PedestrianReport> change)
     {
@@ -45,6 +51,10 @@ public partial class DetallePuntoPage : ContentPage, IQueryAttributable
     private async void OnConfirmarClicked(object? sender, EventArgs e) => await UpdateAsync(r => { r.Confirmed = true; r.ConfirmedAt = DateTimeOffset.UtcNow; });
     private async void OnResolvedClicked(object? sender, EventArgs e) => await UpdateAsync(r => r.Resolved = !r.Resolved);
     private async void OnReportarCambioClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//reportar");
+    private async void OnViewMapClicked(object? sender, EventArgs e)
+    {
+        if (report != null) await Shell.Current.GoToAsync($"//explorar?reportId={report.Id}");
+    }
     private async void OnDirectionsClicked(object? sender, EventArgs e)
     {
         if (report == null) return;

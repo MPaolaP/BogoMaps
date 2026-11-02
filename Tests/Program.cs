@@ -12,11 +12,14 @@ PedestrianReport Valid() => new() { Description = "Andén deteriorado", Address 
 try
 {
     Check((await store.ReadAsync()).Count == 0, "Fresh store must be empty");
-    var first = Valid(); first.Anonymous = true;
+    var first = Valid(); first.Anonymous = true; first.Lighting = "Buena"; first.Pavement = "Deteriorado"; first.Accessibility = "Con barreras"; first.Noise = "Alto";
     await store.SaveAsync(first);
     var restarted = new LocalRepository();
     var restored = (await restarted.ReadAsync()).Single();
     Check(restored.Id == first.Id && restored.Anonymous && restored.Latitude == first.Latitude, "Report must survive restart");
+    Check(restored.Lighting == "Buena" && restored.Pavement == "Deteriorado" && restored.Accessibility == "Con barreras" && restored.Noise == "Alto", "Point assessment must survive restart");
+    var legacy = JsonSerializer.Deserialize<PedestrianReport>("{\"Description\":\"Reporte anterior\"}")!;
+    Check(legacy.Lighting == "Sin evaluar" && legacy.Accessibility == "Sin evaluar", "Legacy reports must show unknown assessments, not fabricated metrics");
     restored.Saved = restored.Confirmed = restored.Resolved = true;
     restored.ConfirmedAt = DateTimeOffset.UtcNow;
     await restarted.SaveAsync(restored);
