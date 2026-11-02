@@ -4,7 +4,7 @@ Aplicación nativa .NET MAUI 9 de movilidad peatonal para Bogotá. Conserva la p
 
 ## Versión local
 
-No requiere cuenta ni backend. Los reportes pertenecen al dispositivo, no representan datos de una comunidad conectada y no certifican la seguridad de una ruta.
+El acceso invitado no requiere cuenta ni backend. La pantalla inicial conserva el formulario y los botones Google/Apple del mockup; el acceso con cuentas, registro y recuperación están pendientes de configurar un proveedor de autenticación. Estos botones informan del requisito y no simulan una sesión ni envían credenciales. Los reportes pertenecen al dispositivo, no representan datos de una comunidad conectada y no certifican la seguridad de una ruta.
 
 - **Explorar:** mapa nativo Mapsui/OpenStreetMap con desplazamiento y zoom; marcadores de reportes, detalle al tocar un marcador, búsqueda por dirección/descripción y filtros por categoría. La búsqueda filtra tus reportes; no consulta un geocodificador.
 - **Reportar:** ubicación GPS con permisos o coordenadas manuales (punto decimal o coma), referencia del lugar, seis categorías, gravedad, descripción y foto desde la galería. Valida una descripción de 1–250 caracteres, dirección y coordenadas dentro del área de Bogotá. El rectángulo de validación es aproximado, no una frontera administrativa.
