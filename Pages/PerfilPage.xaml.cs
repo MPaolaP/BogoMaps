@@ -3,10 +3,18 @@ namespace BogoMaps.Pages;
 public partial class PerfilPage : BogoMaps.Controls.StitchPage
 {
     private string filter = "Activos";
-    public PerfilPage() => InitializeComponent();
+    private bool samplesBusy;
+    public PerfilPage()
+    {
+        InitializeComponent();
+#if DEBUG
+        DemoPanel.IsVisible = true;
+#endif
+    }
     protected override async void OnAppearing() { base.OnAppearing(); await RefreshAsync(); }
     private async Task RefreshAsync()
     {
+        StoragePathLabel.Text = LocalRepository.Instance.StoragePath;
         NameLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("name"), AuthenticationService.Instance.Current?.Email ?? "Caminante");
         BioLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("bio"), "Recorriendo Bogotá a pie.");
         try
@@ -58,6 +66,31 @@ public partial class PerfilPage : BogoMaps.Controls.StitchPage
             await RefreshAsync();
         }
         catch (Exception) { await DisplayAlert("Foto de perfil", "No fue posible cambiar la foto. Inténtalo de nuevo.", "OK"); }
+    }
+    private async void OnLoadSamplesClicked(object? sender, EventArgs e) => await UpdateSamplesAsync(remove: false);
+    private async void OnRemoveSamplesClicked(object? sender, EventArgs e) => await UpdateSamplesAsync(remove: true);
+    private async Task UpdateSamplesAsync(bool remove)
+    {
+        if (samplesBusy) return;
+        samplesBusy = true;
+        DemoPanel.IsEnabled = false;
+        try
+        {
+            if (!await DisplayAlert(remove ? "Retirar ejemplos" : "Cargar ejemplos",
+                remove ? "Se retirarán solo los ejemplos de esta cuenta, incluidos los cambios que hayas hecho sobre ellos. Tus reportes propios se conservan."
+                       : "Se añadirán hasta seis reportes ficticios marcados [Prueba]. No representan el estado real de esos lugares. No se envían a Firebase.",
+                remove ? "Retirar" : "Cargar", "Cancelar")) return;
+            var changed = remove ? await LocalRepository.Instance.RemoveSamplesAsync() : await LocalRepository.Instance.LoadSamplesAsync();
+            await RefreshAsync();
+            await DisplayAlert("Datos de prueba", remove ? $"Se retiraron {changed} ejemplos." : $"Se añadieron {changed} ejemplos. Abre Explorar para verlos en el mapa.", "OK");
+        }
+        catch (Exception) { await DisplayAlert("Datos de prueba", "No fue posible actualizar los ejemplos. No se han reemplazado tus datos locales.", "OK"); }
+        finally { samplesBusy = false; DemoPanel.IsEnabled = true; }
+    }
+    private async void OnCopyStoragePathClicked(object? sender, EventArgs e)
+    {
+        try { await Clipboard.Default.SetTextAsync(LocalRepository.Instance.StoragePath); await DisplayAlert("Archivo local", "Ruta copiada. Cierra la app antes de editar el archivo manualmente y conserva una copia de seguridad.", "OK"); }
+        catch (Exception) { await DisplayAlert("Archivo local", "No fue posible copiar la ruta.", "OK"); }
     }
     private async void OnCerrarSesionClicked(object? sender, EventArgs e)
     {

@@ -24,7 +24,7 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
         if (report == null) return;
         ReportTitle.Text = report.Description;
         AddressLabel.Text = report.Address;
-        StatusLabel.Text = report.Summary;
+        StatusLabel.Text = (report.IsDemo ? "EJEMPLO FICTICIO · " : "") + report.Summary;
         LightingValue.Text = report.Lighting;
         PavementValue.Text = report.Pavement;
         AccessibilityValue.Text = report.Accessibility;

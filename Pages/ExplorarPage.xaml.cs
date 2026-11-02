@@ -85,7 +85,7 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         selectedId = report?.Id;
         SelectedTitle.Text = report?.Description ?? "Explora Bogotá a pie";
         SelectedAddress.Text = report?.Address ?? "Todavía no hay reportes en esta selección. Añade un punto para empezar.";
-        SelectedStatus.Text = report == null ? "TU RED PEATONAL" : $"{report.Category.ToUpperInvariant()} · {(report.Resolved ? "RESUELTO" : "ACTIVO")}";
+        SelectedStatus.Text = report == null ? "TU RED PEATONAL" : $"{(report.IsDemo ? "PRUEBA · " : "")}{report.Category.ToUpperInvariant()} · {(report.Resolved ? "RESUELTO" : "ACTIVO")}";
         var appearance = report == null ? (Icon: "ui_compass", Tone: CivicTone.Blue) : CivicVisuals.Category(report.Category);
         SelectedIcon.SetAppearance(appearance.Icon, appearance.Tone);
         var stateTone = report == null ? CivicTone.Blue : CivicVisuals.State(report.Resolved, report.Severity);

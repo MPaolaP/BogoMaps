@@ -14,7 +14,7 @@ public static class ReportCards
             var category = CivicVisuals.Category(report.Category);
             row.Add(new IconBadge { Icon = category.Icon, Tone = category.Tone });
             row.Add(new VerticalStackLayout { Spacing = 4, Children = {
-                new Label { Text = report.Description, Style = Style("BogoLabel"), FontSize = 13 },
+                new Label { Text = (report.IsDemo && !report.Description.StartsWith("[Prueba]") ? "[Prueba] " : "") + report.Description, Style = Style("BogoLabel"), FontSize = 13 },
                 new Label { Text = report.Address, Style = Style("BogoBodySm"), FontSize = 11 },
                 new Label { Text = $"{report.Category} · {report.CreatedAt.ToLocalTime():dd MMM}", Style = Style("BogoBodySm"), FontSize = 10 } } }, 1);
             var body = new VerticalStackLayout { Spacing = 10, Children = { row } };

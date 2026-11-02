@@ -12,6 +12,46 @@ public sealed class LocalRepository
     private string PathName => Path.Combine(FileSystem.AppDataDirectory, AccountId == null ? "reports-v1.json" :
         "reports-" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(AccountId))) + ".json");
 
+    public string StoragePath => PathName;
+
+    public async Task<int> LoadSamplesAsync()
+    {
+        var path = PathName;
+        await gate.WaitAsync();
+        try
+        {
+            var reports = await ReadCoreAsync(path);
+            var existing = reports.Select(r => r.Id).ToHashSet();
+            var samples = SampleReports.Create().Where(r => !existing.Contains(r.Id)).ToList();
+            if (samples.Count == 0) return 0;
+            reports.AddRange(samples);
+            await WriteCoreAsync(path, reports);
+            return samples.Count;
+        }
+        finally { gate.Release(); }
+    }
+
+    public async Task<int> RemoveSamplesAsync()
+    {
+        var path = PathName;
+        await gate.WaitAsync();
+        try
+        {
+            var reports = await ReadCoreAsync(path);
+            var removed = reports.RemoveAll(r => r.IsDemo && SampleReports.Ids.Contains(r.Id));
+            if (removed > 0) await WriteCoreAsync(path, reports);
+            return removed;
+        }
+        finally { gate.Release(); }
+    }
+
+    private static async Task WriteCoreAsync(string path, List<PedestrianReport> reports)
+    {
+        var temporary = path + ".tmp";
+        await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(reports));
+        File.Move(temporary, path, true);
+    }
+
     public async Task<List<PedestrianReport>> ReadAsync()
     {
         var path = PathName;
@@ -47,9 +87,7 @@ public sealed class LocalRepository
             var reports = await ReadCoreAsync(path);
             var index = reports.FindIndex(r => r.Id == report.Id);
             if (index < 0) reports.Add(report); else reports[index] = report;
-            var temporary = path + ".tmp";
-            await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(reports));
-            File.Move(temporary, path, true);
+            await WriteCoreAsync(path, reports);
         }
         finally { gate.Release(); }
     }

@@ -37,6 +37,17 @@
     </Border>
     <VerticalStackLayout x:Name="ReportList" Spacing="12" />
     <Label Text="Tus aportes se conservan en este dispositivo y se separan por cuenta." Style="{StaticResource BogoBodySm}" FontSize="11" />
+    <Border x:Name="DemoPanel" IsVisible="False" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
+     <VerticalStackLayout Spacing="10">
+      <Label Text="Pruebas locales · Desarrollo" Style="{StaticResource BogoH2}" />
+      <Label Text="Carga seis ejemplos ficticios para probar mapa, filtros, estados y favoritos. Solo afectan a la cuenta actual o al invitado actual." Style="{StaticResource BogoBodySm}" />
+      <Button Text="Cargar datos de prueba" Clicked="OnLoadSamplesClicked" Style="{StaticResource BogoPrimaryButton}" />
+      <Button Text="Retirar datos de prueba" Clicked="OnRemoveSamplesClicked" Style="{StaticResource BogoSecondaryButton}" />
+      <Label Text="Archivo local de esta sesión" Style="{StaticResource BogoLabel}" />
+      <Label x:Name="StoragePathLabel" LineBreakMode="CharacterWrap" Style="{StaticResource BogoBodySm}" FontSize="10" />
+      <Button Text="Copiar ruta del archivo" Clicked="OnCopyStoragePathClicked" Style="{StaticResource BogoSecondaryButton}" />
+     </VerticalStackLayout>
+    </Border>
     <Button Text="Cerrar sesión / salir" Clicked="OnCerrarSesionClicked" Style="{StaticResource BogoDangerButton}" />
    </VerticalStackLayout>
   </ScrollView>

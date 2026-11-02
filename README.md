@@ -66,3 +66,17 @@ Las tarjetas de iluminación, pavimento, accesibilidad y ruido se alimentan de l
 Validación visual pendiente en Windows: revisar a distintos tamaños de ventana, con escalado de pantalla y texto, desplazamiento del mapa y del formulario, navegación inferior, reportes con/sin foto y todas las pestañas de Perfil. El entorno Linux puede compilar Android y ejecutar las pruebas del modelo, pero no capturar las pantallas nativas de Windows.
 
 Los iconos se distribuyen como SVG locales y sus versiones rasterizadas las genera MAUI para cada plataforma. `CivicVisuals` y `IconBadge` aplican los colores semánticos de Stitch: azul para acciones/accesibilidad, ámbar para iluminación/obras, rojo para cruces y verde para puntos recomendados y confirmaciones. La pestaña activa tiene icono y texto azules. Las etiquetas de estado distinguen activo, gravedad y resuelto; los valores «Sin evaluar» se muestran neutros. Los estados también tienen texto, para que la información no dependa solo del color. No se necesita descargar una fuente de iconos al iniciar la aplicación.
+
+## Datos de prueba y ubicación de los datos
+
+No se ha configurado una base de datos remota de reportes. Firebase Authentication guarda las cuentas; la app conserva reportes JSON, fotos y preferencias en el dispositivo. Añadir documentos en Firestore no los mostrará en la app: aún no hay integración de reportes con Firestore ni sincronización entre equipos.
+
+Con `dotnet run --project BogoMaps.csproj -f net9.0-windows10.0.19041.0` se ejecuta normalmente Debug. En **Perfil → Pruebas locales · Desarrollo → Cargar datos de prueba** puedes añadir seis ejemplos de Bogotá. Cubren todas las categorías, tres favoritos, dos resueltos, dos confirmados y distintas valoraciones. Están identificados con `[Prueba]` y no reflejan condiciones reales ni se envían a Firebase. No incluyen fotos; para probar la galería crea un reporte propio con una foto adjunta.
+
+La carga no duplica ejemplos ni reemplaza sus modificaciones. **Retirar datos de prueba** elimina exclusivamente esos ejemplos de la cuenta/invitado actual, incluidos sus cambios, y conserva los reportes propios. El panel solo es visible en compilaciones Debug.
+
+Para comprobar el flujo: carga los ejemplos, abre Explorar, prueba filtros y búsqueda por «Prueba» o dirección, selecciona un marcador y abre el detalle, cambia favorito/confirmación/estado, revisa Guardados y Perfil, y reinicia para comprobar persistencia. Al cambiar de cuenta los datos son independientes; carga ejemplos en esa cuenta si los necesitas allí.
+
+**Dónde está el archivo:** el panel muestra la ruta absoluta de `LocalRepository.StoragePath` y permite copiarla. El directorio se obtiene de `FileSystem.AppDataDirectory`; su ruta concreta depende de si Windows ejecuta la app empaquetada o sin empaquetar. Invitado usa `reports-v1.json`; cada cuenta usa `reports-<SHA256-del-UID>.json` en ese mismo directorio. Las fotos se almacenan allí y el JSON conserva sus rutas. El perfil usa Preferences y el token de sesión usa SecureStorage.
+
+No necesitas editar el JSON para cargar ejemplos. Si vas a inspeccionarlo o editarlo manualmente, copia la ruta del panel, cierra la aplicación y conserva una copia de seguridad antes de modificarlo. Un archivo corrupto se informa como error en lugar de borrarse automáticamente. Estos archivos no se suben a GitHub ni se comparten con otro dispositivo.

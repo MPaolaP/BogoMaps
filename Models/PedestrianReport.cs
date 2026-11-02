@@ -14,6 +14,7 @@ public sealed class PedestrianReport
     public string Accessibility { get; set; } = "Sin evaluar";
     public string Noise { get; set; } = "Sin evaluar";
     public string? Photo { get; set; }
+    public bool IsDemo { get; set; }
     public bool Anonymous { get; set; }
     public bool Saved { get; set; }
     public bool Confirmed { get; set; }
