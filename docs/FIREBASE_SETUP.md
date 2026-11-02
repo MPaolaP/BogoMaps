@@ -18,6 +18,23 @@ Las huellas anteriores no sirven para cualquier APK: al firmar desde Visual Stud
 
 Para iOS se necesita registrar por separado su bundle ID y obtener `GoogleService-Info.plist`; no reutilizar la configuración Android.
 
-## Estado de la aplicación
+## Estado de la integración
 
-La pantalla conserva los controles de acceso del mockup. Hasta integrar y verificar Firebase, Google, Apple, correo, registro y recuperación informan que falta la configuración y no crean una sesión. El acceso invitado mantiene disponible el modo local. La integración y la prueba de cuentas reales siguen pendientes.
+Configuración Android recibida y contrastada: paquete y SHA-1 coinciden con la firma de desarrollo del entorno. La app usa Credential Manager para obtener la credencial Google y Firebase REST para verificarla. Correo/contraseña, registro y recuperación están conectados a Firebase. Apple permanece pendiente; iOS necesita su configuración propia.
+
+`Resources/Raw/firebase-client.json` contiene únicamente configuración cliente pública derivada del archivo recibido, no una cuenta de servicio. No necesita `GoogleServicesJson`: la integración no inicializa el SDK nativo Firebase; utiliza sus APIs REST HTTPS. No se guardan contraseñas. SecureStorage guarda el token de renovación y la sesión se valida al restaurarla.
+
+Los datos locales están separados por UID; salir o entrar como invitado cambia al almacenamiento correspondiente. No hay sincronización remota de reportes.
+
+## Prueba con cuentas reales pendiente
+
+La compilación y las pruebas con HTTP simulado no verifican la configuración remota de proveedores ni sustituyen estas pruebas en un dispositivo con Google Play Services:
+
+1. Instalar el APK firmado con las huellas registradas y tocar Google; probar selección de cuenta y cancelación.
+2. Completar el acceso y comprobar que Firebase Authentication → Usuarios registra la cuenta.
+3. Reiniciar la app y verificar restauración; cerrar sesión y comprobar el retorno al formulario.
+4. Crear una cuenta con correo y contraseña desde el formulario, salir, acceder y solicitar recuperación. Comprobar mensajes con contraseña errónea y sin internet.
+5. Crear un reporte con una cuenta, entrar con otra y como invitado; comprobar aislamiento y regreso a los datos originales al volver a la primera cuenta.
+6. Confirmar que Apple informa de la configuración pendiente, sin simular una sesión.
+
+Si Google indica error de configuración, comprobar paquete, cliente OAuth Web y certificado de **ese APK**. Si Firebase rechaza un método, habilitarlo en Authentication. Las restricciones de API key deben permitir los servicios Firebase Authentication y Secure Token. No desactivar TLS ni introducir secretos OAuth en la app para resolver errores.

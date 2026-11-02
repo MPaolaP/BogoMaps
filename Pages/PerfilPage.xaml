@@ -5,5 +5,5 @@
 <Label Text="Mi impacto" Style="{StaticResource BogoH2}" /><Label x:Name="CountLabel" Style="{StaticResource BogoBody}" />
 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="4"><Button x:Name="TabActivos" Text="Activos" Clicked="OnTabClicked" Style="{StaticResource BogoSecondaryButton}" /><Button x:Name="TabResueltos" Grid.Column="1" Text="Resueltos" Clicked="OnTabClicked" Style="{StaticResource BogoSecondaryButton}" /><Button x:Name="TabGuardados" Grid.Column="2" Text="Guardados" Clicked="OnTabClicked" Style="{StaticResource BogoSecondaryButton}" /></Grid>
 <VerticalStackLayout x:Name="ReportList" Spacing="12" />
-<Label Text="Tus reportes y tu perfil se guardan solo en este dispositivo. No hay cuenta ni sincronización con otros ciudadanos." Style="{StaticResource BogoBodySm}" />
-<Button Text="Salir al inicio" Clicked="OnCerrarSesionClicked" Style="{StaticResource BogoDangerButton}" /></VerticalStackLayout></ScrollView></ContentPage>
+<Label Text="Los reportes y el perfil se conservan en este dispositivo, separados por cuenta. No se sincronizan con otros ciudadanos." Style="{StaticResource BogoBodySm}" />
+<Button Text="Cerrar sesión / salir" Clicked="OnCerrarSesionClicked" Style="{StaticResource BogoDangerButton}" /></VerticalStackLayout></ScrollView></ContentPage>

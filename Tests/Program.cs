@@ -37,6 +37,16 @@ try
         Check(rejected, "Invalid report must be rejected");
     }
     Check((await store.ReadAsync()).Count == 9, "Validation failure must preserve store");
+    store.AccountId = "user-a";
+    Check((await store.ReadAsync()).Count == 0, "Account must not inherit guest reports");
+    await store.SaveAsync(Valid());
+    store.AccountId = "user-b";
+    Check((await store.ReadAsync()).Count == 0, "Accounts must be isolated");
+    store.AccountId = "user-a";
+    Check((await store.ReadAsync()).Count == 1, "Account data must survive account switches");
+    store.AccountId = null;
+    Check((await store.ReadAsync()).Count == 9, "Guest data must remain intact");
+    await AuthClientTests.RunAsync();
     var path = Path.Combine(root, "reports-v1.json");
     await File.WriteAllTextAsync(path, "corrupted data");
     var corruptionReported = false;

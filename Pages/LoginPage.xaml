@@ -12,7 +12,7 @@
             <Setter Property="StrokeShape"><Setter.Value><RoundRectangle CornerRadius="12" /></Setter.Value></Setter>
         </Style>
     </ContentPage.Resources>
-    <Grid RowDefinitions="56,*">
+    <Grid x:Name="LoginForm" RowDefinitions="56,*">
         <Grid Padding="16,4" ColumnDefinitions="44,*,44" BackgroundColor="{StaticResource Surface}">
             <Button Text="←" FontSize="22" CornerRadius="12" BackgroundColor="{StaticResource SurfaceLow}"
                     TextColor="{StaticResource OnSurface}" Clicked="OnBackClicked" SemanticProperties.Description="Explorar como invitado" />
@@ -39,7 +39,7 @@
                 </VerticalStackLayout>
                 <Border Style="{StaticResource BogoCard}" Padding="16">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Correo electrónico o celular" Style="{StaticResource BogoLabel}" FontSize="11" />
+                        <Label Text="Correo electrónico" Style="{StaticResource BogoLabel}" FontSize="11" />
                         <Border Style="{StaticResource LoginField}">
                             <Grid ColumnDefinitions="24,*" ColumnSpacing="6">
                                 <Label Text="@" TextColor="{StaticResource Outline}" FontSize="22" VerticalOptions="Center" />
@@ -47,7 +47,7 @@
                                        ReturnType="Next" Completed="OnUsuarioCompleted"
                                        FontFamily="JakartaRegular" FontSize="14" HeightRequest="48"
                                        TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"
-                                       SemanticProperties.Description="Correo electrónico o celular" />
+                                       SemanticProperties.Description="Correo electrónico" />
                             </Grid>
                         </Border>
                         <Grid ColumnDefinitions="*,Auto">
@@ -113,5 +113,8 @@
                 </Border>
             </VerticalStackLayout>
         </ScrollView>
+        <ActivityIndicator x:Name="AuthBusy" Grid.RowSpan="2" IsVisible="False" IsRunning="False"
+                           Color="{StaticResource BrandPrimary}" HorizontalOptions="Center" VerticalOptions="Center"
+                           InputTransparent="True" SemanticProperties.Description="Conectando con Firebase" />
     </Grid>
 </ContentPage>

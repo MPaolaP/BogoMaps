@@ -7,8 +7,8 @@ public partial class PerfilPage : ContentPage
     protected override async void OnAppearing() { base.OnAppearing(); await RefreshAsync(); }
     private async Task RefreshAsync()
     {
-        NameLabel.Text = Preferences.Default.Get("profile.name", "Caminante");
-        BioLabel.Text = Preferences.Default.Get("profile.bio", "Recorriendo Bogotá a pie.");
+        NameLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("name"), AuthenticationService.Instance.Current?.Email ?? "Caminante");
+        BioLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("bio"), "Recorriendo Bogotá a pie.");
         try
         {
             var reports = await LocalRepository.Instance.ReadAsync();
@@ -25,10 +25,14 @@ public partial class PerfilPage : ContentPage
         if (string.IsNullOrWhiteSpace(name)) return;
         var bio = await DisplayPromptAsync("Editar perfil", "Acerca de ti", initialValue: BioLabel.Text, maxLength: 250);
         if (bio == null) return;
-        Preferences.Default.Set("profile.name", name.Trim());
-        Preferences.Default.Set("profile.bio", bio.Trim());
+        Preferences.Default.Set(AuthenticationService.Instance.ProfileKey("name"), name.Trim());
+        Preferences.Default.Set(AuthenticationService.Instance.ProfileKey("bio"), bio.Trim());
         await RefreshAsync();
     }
     private async void OnTabClicked(object? sender, EventArgs e) { if (sender is Button button) { filter = button.Text; await RefreshAsync(); } }
-    private async void OnCerrarSesionClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//login");
+    private async void OnCerrarSesionClicked(object? sender, EventArgs e)
+    {
+        AuthenticationService.Instance.SignOut();
+        await Shell.Current.GoToAsync("//login");
+    }
 }
