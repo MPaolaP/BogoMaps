@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1, "titulo": "Cruce Carrera 7 con Calle 67", "ubicacion": "Chapinero Central • Bogotá D.C.",
+    "categoria": "Accesibilidad", "gravedad": "Bajo", "latitud": 4.6490, "longitud": -74.0605,
+    "calificacion": 4.8, "confirmaciones": 34,
+    "detalles": [ { "titulo": "Iluminación LED", "valor": "Visibilidad alta" }, { "titulo": "Rampa rebajada", "valor": "Paso nivelado 100%" } ]
+  },
+  {
+    "id": 2, "titulo": "Baldosa suelta con lluvia", "ubicacion": "Calle 72 con Cra 11 • Chapinero",
+    "categoria": "Aceras", "gravedad": "Moderado", "latitud": 4.6588, "longitud": -74.0595,
+    "calificacion": 3.1, "confirmaciones": 12,
+    "detalles": [ { "titulo": "Riesgo de tropiezo", "valor": "Se agrava con lluvia" }, { "titulo": "Zona afectada", "valor": "Aprox. 3 baldosas" } ]
+  },
+  {
+    "id": 3, "titulo": "Luminaria restaurada", "ubicacion": "Cra 9 con Calle 69 • Chapinero",
+    "categoria": "Iluminacion", "gravedad": "Bajo", "latitud": 4.6535, "longitud": -74.0612,
+    "calificacion": 4.5, "confirmaciones": 21,
+    "detalles": [ { "titulo": "Corredor seguro", "valor": "Activo de noche" }, { "titulo": "Luminarias", "valor": "6 de 6 operativas" } ]
+  },
+  {
+    "id": 4, "titulo": "Paso peatonal sin rampa", "ubicacion": "Av. Caracas con Calle 26 • Teusaquillo",
+    "categoria": "Accesibilidad", "gravedad": "Critico", "latitud": 4.6243, "longitud": -74.0689,
+    "calificacion": 2.2, "confirmaciones": 47,
+    "detalles": [ { "titulo": "Sin rampa", "valor": "Bloquea sillas de ruedas" }, { "titulo": "Alternativa", "valor": "Cruce a 180 m" } ]
+  },
+  {
+    "id": 5, "titulo": "Andén en obra sin desvío", "ubicacion": "Cra 13 con Calle 53 • Chapinero",
+    "categoria": "Aceras", "gravedad": "Critico", "latitud": 4.6401, "longitud": -74.0646,
+    "calificacion": 2.4, "confirmaciones": 29,
+    "detalles": [ { "titulo": "Andén cerrado", "valor": "Peatones bajan a la calzada" }, { "titulo": "Señalización", "valor": "Inexistente" } ]
+  },
+  {
+    "id": 6, "titulo": "Parque con buena iluminación", "ubicacion": "Parque de la 93 • Chapinero",
+    "categoria": "Iluminacion", "gravedad": "Bajo", "latitud": 4.6764, "longitud": -74.0483,
+    "calificacion": 4.7, "confirmaciones": 58,
+    "detalles": [ { "titulo": "Iluminación LED", "valor": "Cobertura completa" }, { "titulo": "Vigilancia", "valor": "Presencia constante" } ]
+  },
+  {
+    "id": 7, "titulo": "Esquina poco iluminada", "ubicacion": "Calle 100 con Cra 15 • Usaquén",
+    "categoria": "Seguridad", "gravedad": "Moderado", "latitud": 4.6830, "longitud": -74.0460,
+    "calificacion": 3.3, "confirmaciones": 16,
+    "detalles": [ { "titulo": "Luminarias", "valor": "2 de 5 fuera de servicio" }, { "titulo": "Horario crítico", "valor": "Después de las 7 p. m." } ]
+  },
+  {
+    "id": 8, "titulo": "Plaza de Bolívar", "ubicacion": "La Candelaria • Bogotá D.C.",
+    "categoria": "Seguridad", "gravedad": "Bajo", "latitud": 4.5981, "longitud": -74.0760,
+    "calificacion": 4.2, "confirmaciones": 73,
+    "detalles": [ { "titulo": "Vigilancia", "valor": "Policía y cámaras" }, { "titulo": "Superficie", "valor": "Plana y amplia" } ]
+  },
+  {
+    "id": 9, "titulo": "Acera angosta con postes", "ubicacion": "Cra 30 con Calle 45 • Teusaquillo",
+    "categoria": "Aceras", "gravedad": "Moderado", "latitud": 4.6382, "longitud": -74.0830,
+    "calificacion": 3.0, "confirmaciones": 19,
+    "detalles": [ { "titulo": "Ancho libre", "valor": "Menos de 80 cm" }, { "titulo": "Obstáculos", "valor": "Postes y puestos" } ]
+  },
+  {
+    "id": 10, "titulo": "Entrada Parque Simón Bolívar", "ubicacion": "Calle 63 • Teusaquillo",
+    "categoria": "Accesibilidad", "gravedad": "Bajo", "latitud": 4.6585, "longitud": -74.0930,
+    "calificacion": 4.6, "confirmaciones": 41,
+    "detalles": [ { "titulo": "Rampas", "valor": "Pendiente suave" }, { "titulo": "Piso táctil", "valor": "Disponible" } ]
+  },
+  {
+    "id": 11, "titulo": "Cruce sin semáforo peatonal", "ubicacion": "Av. Boyacá con Calle 80 • Engativá",
+    "categoria": "Seguridad", "gravedad": "Critico", "latitud": 4.6935, "longitud": -74.0830,
+    "calificacion": 1.9, "confirmaciones": 52,
+    "detalles": [ { "titulo": "Sin semáforo", "valor": "Tráfico rápido" }, { "titulo": "Incidentes", "valor": "Reportados este mes" } ]
+  },
+  {
+    "id": 12, "titulo": "Calle empedrada irregular", "ubicacion": "Usaquén centro • Usaquén",
+    "categoria": "Aceras", "gravedad": "Moderado", "latitud": 4.6945, "longitud": -74.0306,
+    "calificacion": 3.4, "confirmaciones": 14,
+    "detalles": [ { "titulo": "Superficie", "valor": "Adoquín desnivelado" }, { "titulo": "Accesibilidad", "valor": "Difícil para ruedas" } ]
+  },
+  {
+    "id": 13, "titulo": "Tramo con luminarias apagadas", "ubicacion": "Cra 24 con Calle 39 • Teusaquillo",
+    "categoria": "Iluminacion", "gravedad": "Critico", "latitud": 4.6290, "longitud": -74.0755,
+    "calificacion": 2.1, "confirmaciones": 33,
+    "detalles": [ { "titulo": "Luminarias", "valor": "Tramo completo apagado" }, { "titulo": "Riesgo", "valor": "Alto de noche" } ]
+  },
+  {
+    "id": 14, "titulo": "Estación con acceso nivelado", "ubicacion": "Av. Caracas con Calle 76 • Chapinero",
+    "categoria": "Accesibilidad", "gravedad": "Bajo", "latitud": 4.6660, "longitud": -74.0562,
+    "calificacion": 4.4, "confirmaciones": 37,
+    "detalles": [ { "titulo": "Acceso", "valor": "Rampa y ascensor" }, { "titulo": "Señalización", "valor": "Clara y visible" } ]
+  },
+  {
+    "id": 15, "titulo": "Andén amplio y arborizado", "ubicacion": "Cra 5 con Calle 69A • Chapinero",
+    "categoria": "Aceras", "gravedad": "Bajo", "latitud": 4.6518, "longitud": -74.0572,
+    "calificacion": 4.6, "confirmaciones": 26,
+    "detalles": [ { "titulo": "Ancho libre", "valor": "Más de 2 m" }, { "titulo": "Sombra", "valor": "Árboles continuos" } ]
+  },
+  {
+    "id": 16, "titulo": "Portal con zona oscura", "ubicacion": "Portal Américas • Kennedy",
+    "categoria": "Seguridad", "gravedad": "Moderado", "latitud": 4.6180, "longitud": -74.1370,
+    "calificacion": 3.0, "confirmaciones": 24,
+    "detalles": [ { "titulo": "Iluminación", "valor": "Irregular en el acceso" }, { "titulo": "Afluencia", "valor": "Baja en la noche" } ]
+  }
+]
