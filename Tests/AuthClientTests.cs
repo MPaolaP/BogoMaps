@@ -30,6 +30,11 @@ internal static class AuthClientTests
         await client.SignInAsync("test@example.com", "password-test", true);
         endpoint = "signInWithIdp";
         await client.GoogleAsync("google-token-test");
+        status = HttpStatusCode.BadRequest;
+        response = "{\"error\":{\"message\":\"OPERATION_NOT_ALLOWED\"}}";
+        try { await client.GoogleAsync("google-token-test"); throw new Exception("Disabled Google provider accepted"); }
+        catch (FirebaseAuthException ex) when (ex.Code == "OPERATION_NOT_ALLOWED" && ex.Message.Contains("Google")) { }
+        status = HttpStatusCode.OK;
         endpoint = "sendOobCode";
         response = "{}";
         await client.ResetAsync("test@example.com");
@@ -42,6 +47,18 @@ internal static class AuthClientTests
         response = "{\"error\":{\"message\":\"INVALID_LOGIN_CREDENTIALS\"}}";
         try { await client.SignInAsync("test@example.com", "wrong"); throw new Exception("Failed credentials accepted"); }
         catch (FirebaseAuthException ex) when (ex.Code == "INVALID_LOGIN_CREDENTIALS") { }
+        foreach (var code in new[] { "OPERATION_NOT_ALLOWED", "PASSWORD_LOGIN_DISABLED", "CONFIGURATION_NOT_FOUND" })
+        {
+            response = JsonSerializer.Serialize(new { error = new { message = code } });
+            try { await client.SignInAsync("test@example.com", "wrong"); throw new Exception("Provider rejection was accepted"); }
+            catch (FirebaseAuthException ex) when (ex.Code == code && ex.Message.Contains("Firebase")) { }
+        }
+        response = "{\"error\":{\"message\":\"Requests from this Android client are blocked.\",\"details\":[{\"reason\":\"API_KEY_ANDROID_APP_BLOCKED\"}]}}";
+        try { await client.SignInAsync("test@example.com", "wrong"); throw new Exception("API restriction was ignored"); }
+        catch (FirebaseAuthException ex) when (ex.Code == "API_KEY_ANDROID_APP_BLOCKED" && ex.Message.Contains("Windows")) { }
+        response = "{\"error\":{\"message\":\"request contains test@example.com and credential details\"}}";
+        try { await client.SignInAsync("test@example.com", "wrong"); throw new Exception("Unknown error was accepted"); }
+        catch (FirebaseAuthException ex) when (ex.Code == "UNKNOWN" && !ex.Message.Contains("test@example.com")) { }
         endpoint = "sendOobCode";
         response = "{\"error\":{\"message\":\"EMAIL_NOT_FOUND\"}}";
         await client.ResetAsync("test@example.com");

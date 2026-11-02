@@ -38,3 +38,16 @@ La compilación y las pruebas con HTTP simulado no verifican la configuración r
 6. Confirmar que Apple informa de la configuración pendiente, sin simular una sesión.
 
 Si Google indica error de configuración, comprobar paquete, cliente OAuth Web y certificado de **ese APK**. Si Firebase rechaza un método, habilitarlo en Authentication. Las restricciones de API key deben permitir los servicios Firebase Authentication y Secure Token. No desactivar TLS ni introducir secretos OAuth en la app para resolver errores.
+
+## Si ejecutas la aplicación en Windows
+
+El comando `dotnet run --project BogoMaps.csproj -f net9.0-windows10.0.19041.0` inicia la versión Windows, no un emulador Android.
+
+- **Correo y contraseña:** la app usa la API REST de Firebase, que también sirve en Windows. Primero habilita **Authentication → Método de acceso → Correo electrónico/contraseña → Habilitar → Guardar**, en el mismo proyecto del archivo recibido. Solo entonces crea la cuenta usando el correo y contraseña del formulario; habilitar Google no habilita el registro por contraseña.
+- **Google:** el selector implementado usa Android Credential Manager. No funciona en Windows. Para esta plataforma falta un flujo de navegador del sistema y la configuración OAuth correspondiente (cliente de escritorio), además del intercambio con Firebase. No basta con volver a descargar el archivo Android.
+- **Restricciones de API key:** una key restringida a aplicaciones Android no admite llamadas de Windows. Solo si aparece `API_KEY_ANDROID_APP_BLOCKED`, configura una key cliente separada para Windows, permitiendo las APIs Firebase Authentication/Identity Toolkit y Secure Token; conserva las restricciones de la key Android. No publiques cuentas de servicio ni claves de servidor para resolver este error.
+- **Invitado:** permite usar los reportes locales sin crear una cuenta Firebase.
+
+Los errores desconocidos ahora muestran HTTP y un código de Firebase acotado, sin correo, contraseña ni respuesta sin filtrar. `OPERATION_NOT_ALLOWED` y `PASSWORD_LOGIN_DISABLED` indican proveedor deshabilitado; `CONFIGURATION_NOT_FOUND` indica que Authentication no está inicializado. No atribuir un mensaje genérico a un fallo de red sin el código concreto.
+
+La compilación y ejecución Windows necesitan Windows y no se han verificado en este entorno Linux. La compilación Android y las pruebas HTTP simuladas no sustituyen esa validación.

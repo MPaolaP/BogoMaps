@@ -28,6 +28,8 @@ public sealed class AuthenticationService
 #if ANDROID
         var idToken = await Platforms.Android.GoogleAccountSignIn.SignInAsync(webClientId!);
         await AcceptAsync(await firebase.GoogleAsync(idToken));
+#elif WINDOWS
+        throw new PlatformNotSupportedException("Google en Windows aún no está implementado. La configuración recibida y el selector de cuentas integrados corresponden a Android. Puedes usar correo/contraseña después de habilitar ese proveedor en Firebase, o explorar como invitado.");
 #else
         throw new PlatformNotSupportedException("El archivo recibido configura Android. Google en esta plataforma requiere su configuración nativa.");
 #endif
