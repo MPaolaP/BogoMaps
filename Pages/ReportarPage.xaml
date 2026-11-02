@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BogoMaps.Pages.ReportarPage"
@@ -31,7 +31,7 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout>
                             <Label Text="Lugar seleccionado" FontSize="11" Style="{StaticResource BogoBodySm}" />
-                            <Label x:Name="UbicacionLabel" Text="Cra 13 con Calle 53, Bogotá" Style="{StaticResource BogoLabel}" />
+                            <Label x:Name="UbicacionLabel" Text="Selecciona tu ubicación con GPS o coordenadas" Style="{StaticResource BogoLabel}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -41,6 +41,11 @@
                         Clicked="OnGpsClicked" />
             </VerticalStackLayout>
 
+            <Entry x:Name="AddressEntry" Placeholder="Dirección o referencia del lugar" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Entry x:Name="LatitudeEntry" Placeholder="Latitud (4.65)" Keyboard="Numeric" />
+                <Entry x:Name="LongitudeEntry" Grid.Column="1" Placeholder="Longitud (-74.06)" Keyboard="Numeric" />
+            </Grid>
             <!-- Categoría -->
             <VerticalStackLayout Spacing="8">
                 <Grid ColumnDefinitions="*,Auto">
@@ -104,7 +109,7 @@
             <!-- Evidencia -->
             <VerticalStackLayout Spacing="8">
                 <Label Text="Evidencia visual" Style="{StaticResource BogoLabel}" FontSize="14" />
-                <Button Text="&#x1F4F7; Tomar foto" Style="{StaticResource BogoSecondaryButton}"
+                <Button x:Name="PhotoButton" Text="Adjuntar foto" Style="{StaticResource BogoSecondaryButton}"
                         TextColor="{StaticResource BrandPrimary}" Clicked="OnFotoClicked" />
             </VerticalStackLayout>
 
@@ -115,7 +120,7 @@
                     <Label Grid.Column="1" Text="Máx. 250 caract." FontSize="11" Style="{StaticResource BogoBodySm}" />
                 </Grid>
                 <Border Style="{StaticResource BogoCard}" Padding="8">
-                    <Editor x:Name="DescripcionEditor"
+                    <Editor x:Name="DescriptionEditor"
                             HeightRequest="90"
                             MaxLength="250"
                             Placeholder="Describe detalles que ayuden a otros peatones..."
@@ -130,16 +135,16 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <VerticalStackLayout>
                         <Label Text="Publicar en modo anónimo" Style="{StaticResource BogoLabel}" FontSize="13" />
-                        <Label Text="Oculta tu usuario en el mapa público" FontSize="11" Style="{StaticResource BogoBodySm}" />
+                        <Label Text="El reporte no mostrará tu nombre" FontSize="11" Style="{StaticResource BogoBodySm}" />
                     </VerticalStackLayout>
                     <Switch Grid.Column="1" x:Name="AnonimoSwitch" OnColor="{StaticResource BrandPrimary}" />
                 </Grid>
             </Border>
 
             <VerticalStackLayout Spacing="6">
-                <Button x:Name="PublicarBtn" Text="Publicar Reporte en el Mapa"
+                <Button x:Name="PublicarBtn" Text="Guardar reporte en mi mapa"
                         Style="{StaticResource BogoPrimaryButton}" Clicked="OnPublicarClicked" />
-                <Label Text="Al reportar, aportas a los datos abiertos del Sistema Peatonal Distrital."
+                <Label Text="Modo local: este reporte se guarda únicamente en tu dispositivo."
                        FontSize="11" HorizontalTextAlignment="Center" Style="{StaticResource BogoBodySm}" />
             </VerticalStackLayout>
         </VerticalStackLayout>

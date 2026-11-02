@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BogoMaps.Pages.GuardadosPage" Title="Guardados" BackgroundColor="{StaticResource Surface}">
+<ScrollView><VerticalStackLayout Padding="16" Spacing="20">
+<Label Text="Mis puntos guardados" Style="{StaticResource BogoH1}" /><Label Text="Disponibles en este dispositivo" Style="{StaticResource BogoBodySm}" /><VerticalStackLayout x:Name="ReportList" Spacing="12" /></VerticalStackLayout></ScrollView></ContentPage>

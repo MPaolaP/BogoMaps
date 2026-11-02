@@ -28,5 +28,7 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+<key>NSLocationWhenInUseUsageDescription</key><string>Ubicar los reportes peatonales en Bogotá.</string>
+<key>NSPhotoLibraryUsageDescription</key><string>Adjuntar evidencia a un reporte peatonal.</string>
 </dict>
 </plist>

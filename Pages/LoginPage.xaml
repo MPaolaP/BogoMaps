@@ -23,48 +23,16 @@
                            FontFamily="{StaticResource FontLabel}" />
                 </Border>
                 <Label Text="Bienvenido a BogoMaps" Style="{StaticResource BogoH1}" HorizontalOptions="Center" />
-                <Label Text="Inicia sesi&#xF3;n para reportar el estado de las v&#xED;as, guardar tus rutas peatonales favoritas y cuidar a la comunidad caminante de Bogot&#xE1;."
+                <Label Text="Tu mapa peatonal de Bogotá: explora, reporta y guarda puntos de interés."
                        Style="{StaticResource BogoBodySm}" HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
 
             <Border Style="{StaticResource BogoCard}">
                 <VerticalStackLayout Spacing="16">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Correo electr&#xF3;nico o celular" Style="{StaticResource BogoLabel}" />
-                        <Border BackgroundColor="{StaticResource SurfaceLow}" StrokeThickness="0" Padding="12,0">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
-                            <Entry x:Name="UsuarioEntry" Placeholder="ejemplo@correo.com" Keyboard="Email"
-                                   TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"
-                                   FontFamily="{StaticResource FontRegular}" HeightRequest="48" />
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Spacing="6">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="Contrase&#xF1;a" Style="{StaticResource BogoLabel}" />
-                            <Label Grid.Column="1" Text="&#xBF;Olvidaste tu contrase&#xF1;a?" FontSize="11"
-                                   TextColor="{StaticResource BrandPrimary}" FontFamily="{StaticResource FontLabel}" />
-                        </Grid>
-                        <Border BackgroundColor="{StaticResource SurfaceLow}" StrokeThickness="0" Padding="12,0">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Entry x:Name="ClaveEntry" Placeholder="********" IsPassword="True"
-                                       TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"
-                                       FontFamily="{StaticResource FontRegular}" HeightRequest="48" />
-                                <Button Grid.Column="1" x:Name="MostrarClaveButton" Text="Ver" FontSize="12"
-                                        BackgroundColor="Transparent" TextColor="{StaticResource Outline}"
-                                        Clicked="OnToggleClave" />
-                            </Grid>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <Button Text="Iniciar sesi&#xF3;n" Style="{StaticResource BogoPrimaryButton}" Clicked="OnLoginClicked" />
-
-                    <Label Text="o contin&#xFA;a con" Style="{StaticResource BogoBodySm}" HorizontalOptions="Center" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Button Text="Google" Style="{StaticResource BogoSecondaryButton}" HeightRequest="48" />
-                        <Button Grid.Column="1" Text="Apple" Style="{StaticResource BogoSecondaryButton}" HeightRequest="48" />
-                    </Grid>
+                    <Label Text="Modo local" Style="{StaticResource BogoH2}" />
+                    <Label Text="Explora Bogotá y guarda tus reportes en este dispositivo. No necesitas cuenta; los datos no se comparten con otros ciudadanos." Style="{StaticResource BogoBody}" />
+                    <Entry x:Name="UsuarioEntry" Placeholder="¿Cómo te llamas? (opcional)" MaxLength="60" />
+                    <Button Text="Comenzar" Clicked="OnLoginClicked" Style="{StaticResource BogoPrimaryButton}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -82,11 +50,7 @@
                 </Grid>
             </Border>
 
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
-                <Label Text="&#xBF;No tienes una cuenta?" Style="{StaticResource BogoBodySm}" />
-                <Label Text="Reg&#xED;strate gratis" FontSize="13" TextColor="{StaticResource BrandPrimary}"
-                       FontFamily="{StaticResource FontBold}" />
-            </HorizontalStackLayout>
+
 
             <Label Text="Tus datos colaborativos impulsan una movilidad peatonal m&#xE1;s segura en Bogot&#xE1;."
                    Style="{StaticResource BogoBodySm}" FontSize="11" HorizontalTextAlignment="Center" />

@@ -1,7 +1,12 @@
-﻿namespace BogoMaps.Pages;
+using BogoMaps.Models;
+using BogoMaps.Services;
+using System.Globalization;
+namespace BogoMaps.Pages;
 
 public partial class ReportarPage : ContentPage
 {
+    private string category = "Aceras";
+    private string? photo;
     public ReportarPage()
     {
         InitializeComponent();
@@ -14,6 +19,7 @@ public partial class ReportarPage : ContentPage
         if (sender is not Border tapped)
             return;
 
+        category = new[] { "Aceras", "Iluminación", "Accesibilidad", "Cruces", "Obras", "Punto seguro" }[CategoriaGrid.Children.IndexOf(tapped)];
         foreach (var child in CategoriaGrid.Children.OfType<Border>())
         {
             var selected = child == tapped;
@@ -59,20 +65,54 @@ public partial class ReportarPage : ContentPage
 
     private async void OnGpsClicked(object? sender, EventArgs e)
     {
-        await DisplayAlert("GPS", "Pendiente: obtener la ubicación actual del dispositivo.", "OK");
+        try
+        {
+            var location = await DeviceLocation.GetAsync();
+            LatitudeEntry.Text = location.Latitude.ToString(CultureInfo.InvariantCulture);
+            LongitudeEntry.Text = location.Longitude.ToString(CultureInfo.InvariantCulture);
+            UbicacionLabel.Text = "Ubicación GPS obtenida";
+        }
+        catch (Exception ex) { await DisplayAlert("GPS", ex.Message, "OK"); }
     }
-
     private async void OnFotoClicked(object? sender, EventArgs e)
     {
-        await DisplayAlert("Foto", "Pendiente: captura de foto con MediaPicker.", "OK");
+        try
+        {
+            var file = await MediaPicker.Default.PickPhotoAsync();
+            if (file == null) return;
+            var destination = Path.Combine(FileSystem.AppDataDirectory, Guid.NewGuid() + Path.GetExtension(file.FileName));
+            using var input = await file.OpenReadAsync();
+            using var output = File.Create(destination);
+            await input.CopyToAsync(output);
+            if (photo != null) File.Delete(photo);
+            photo = destination;
+            PhotoButton.Text = "Foto adjunta · cambiar";
+        }
+        catch (Exception) { await DisplayAlert("Foto", "No fue posible adjuntar la foto. Revisa los permisos e inténtalo de nuevo.", "OK"); }
     }
-
     private async void OnPublicarClicked(object? sender, EventArgs e)
     {
+        if (!PublicarBtn.IsEnabled) return;
         PublicarBtn.IsEnabled = false;
-        PublicarBtn.Text = "Publicando reporte...";
-        await Task.Delay(900);
-        PublicarBtn.BackgroundColor = Res("BrandSecondary");
-        PublicarBtn.Text = "¡Reporte Registrado!";
+        try
+        {
+            if (!double.TryParse(LatitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var latitude) ||
+                !double.TryParse(LongitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var longitude))
+                throw new ArgumentException("Obtén tu ubicación GPS o introduce coordenadas válidas.");
+            var report = new PedestrianReport { Category = category, Description = DescriptionEditor.Text?.Trim() ?? "",
+                Address = AddressEntry.Text?.Trim() ?? "", Latitude = latitude, Longitude = longitude,
+                Severity = GravedadLabel.Text, Photo = photo, Anonymous = AnonimoSwitch.IsToggled };
+            if (string.IsNullOrWhiteSpace(report.Address)) throw new ArgumentException("Escribe una dirección o referencia del lugar.");
+            await LocalRepository.Instance.SaveAsync(report);
+            photo = null;
+            DescriptionEditor.Text = AddressEntry.Text = LatitudeEntry.Text = LongitudeEntry.Text = "";
+            AnonimoSwitch.IsToggled = false;
+            PhotoButton.Text = "Adjuntar foto";
+            UbicacionLabel.Text = "Selecciona tu ubicación con GPS o coordenadas";
+            await DisplayAlert("Reporte guardado", "Disponible en tu mapa local. No se ha enviado a un servidor.", "OK");
+            await Shell.Current.GoToAsync("//explorar");
+        }
+        catch (Exception ex) { await DisplayAlert("No se guardó el reporte", ex.Message, "OK"); }
+        finally { PublicarBtn.IsEnabled = true; }
     }
 }

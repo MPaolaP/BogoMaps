@@ -1,138 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="BogoMaps.Pages.DetallePuntoPage"
-             Title="Guardados"
-             BackgroundColor="{StaticResource Surface}"
-             Shell.NavBarIsVisible="False">
-
-    <ScrollView>
-        <VerticalStackLayout Spacing="0">
-
-            <!-- Hero -->
-            <Grid HeightRequest="260" BackgroundColor="{StaticResource OnSurface}">
-                <VerticalStackLayout VerticalOptions="End" Padding="16" Spacing="4">
-                    <Label Text="Chapinero Central • Tramo Seguro" FontSize="11" TextColor="{StaticResource SurfaceHighest}" />
-                    <Label Text="Cra 7 con Calle 72" FontSize="24" TextColor="White" FontFamily="{StaticResource FontBold}" />
-                    <Label Text="Andén Oriental amplio y corredor peatonal continuo" FontSize="13" TextColor="{StaticResource SurfaceHighest}" />
-                </VerticalStackLayout>
-                <Button x:Name="GuardarBtn" Text="&#x1F516; Guardar" HorizontalOptions="End" VerticalOptions="Start"
-                        Margin="16" HeightRequest="40" CornerRadius="20" FontSize="12" Padding="14,0"
-                        BackgroundColor="{StaticResource Surface}" TextColor="{StaticResource OnSurface}"
-                        Clicked="OnGuardarClicked" />
-            </Grid>
-
-            <VerticalStackLayout Padding="16" Spacing="20">
-
-                <!-- Estado del tramo -->
-                <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Estado del tramo" Style="{StaticResource BogoH2}" />
-                        <Label Grid.Column="1" Text="Actualizado hace 18 min" FontSize="11"
-                               TextColor="{StaticResource BrandPrimary}" FontFamily="{StaticResource FontBold}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
-                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="14">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="92%" Style="{StaticResource BogoH2}" />
-                                <Label Text="Iluminación" Style="{StaticResource BogoLabel}" />
-                                <Label Text="LEDs operativos" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Border>
-                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="14">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="Bueno" Style="{StaticResource BogoH2}" TextColor="{StaticResource BrandSecondary}" />
-                                <Label Text="Pavimento" Style="{StaticResource BogoLabel}" />
-                                <Label Text="Adoquín parejo" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Border>
-                        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="14">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="Apto" Style="{StaticResource BogoH2}" TextColor="{StaticResource BrandPrimary}" />
-                                <Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" />
-                                <Label Text="Rampas y podotáctil" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Border>
-                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="14">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="Medio" Style="{StaticResource BogoH2}" />
-                                <Label Text="Tráfico &amp; Ruido" Style="{StaticResource BogoLabel}" />
-                                <Label Text="Flujo moderado" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Border>
-                    </Grid>
-                </VerticalStackLayout>
-
-                <!-- Horario sugerido -->
-                <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
-                    <VerticalStackLayout Spacing="8">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="Horario sugerido para caminar" Style="{StaticResource BogoLabel}" FontSize="13" />
-                            <Border Grid.Column="1" BackgroundColor="{StaticResource SecondaryFixed}" StrokeThickness="0" Padding="8,2">
-                                <Border.StrokeShape><RoundRectangle CornerRadius="999" /></Border.StrokeShape>
-                                <Label Text="Recomendado" FontSize="11" TextColor="{StaticResource BrandSecondary}" FontFamily="{StaticResource FontBold}" />
-                            </Border>
-                        </Grid>
-                        <Label Text="06:00 - 21:30" Style="{StaticResource BogoH2}" />
-                        <Label Text="Mayor vigilancia y flujo activo" Style="{StaticResource BogoBodySm}" />
-                        <Grid ColumnDefinitions="25*,64*,11*" HeightRequest="12" ColumnSpacing="0">
-                            <BoxView Grid.Column="0" Color="{StaticResource ErrorContainer}" />
-                            <BoxView Grid.Column="1" Color="{StaticResource BrandSecondary}" />
-                            <BoxView Grid.Column="2" Color="{StaticResource TertiaryFixed}" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Reportes ciudadanos -->
-                <VerticalStackLayout Spacing="10">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Reportes ciudadanos" Style="{StaticResource BogoH2}" />
-                        <Label Grid.Column="1" Text="Ver todos" Style="{StaticResource BogoLabel}" TextColor="{StaticResource BrandPrimary}" />
-                    </Grid>
-                    <Border Style="{StaticResource BogoCard}" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <VerticalStackLayout>
-                                    <Label Text="Mariana Duque" Style="{StaticResource BogoLabel}" />
-                                    <Label Text="Ayer a las 7:15 PM" Style="{StaticResource BogoBodySm}" />
-                                </VerticalStackLayout>
-                                <Label Grid.Column="1" Text="&#x1F44D; Útil (14)" FontSize="11" TextColor="{StaticResource BrandSecondary}" />
-                            </Grid>
-                            <Label Text="El tramo de la 72 hacia la 73 está súper iluminado. Hay CAI móvil cerca y se siente muy seguro para caminar solo." Style="{StaticResource BogoBody}" />
-                        </VerticalStackLayout>
-                    </Border>
-                    <Border Style="{StaticResource BogoCard}" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <VerticalStackLayout>
-                                    <Label Text="Carlos H. Forero" Style="{StaticResource BogoLabel}" />
-                                    <Label Text="Hoy a las 12:30 PM" Style="{StaticResource BogoBodySm}" />
-                                </VerticalStackLayout>
-                                <Label Grid.Column="1" Text="&#x1F44D; Útil (6)" FontSize="11" TextColor="{StaticResource OnSurfaceVariant}" />
-                            </Grid>
-                            <Label Text="Mucho flujo en horas pico, pero el andén es lo bastante ancho para pasar con coche de bebé sin tropiezos." Style="{StaticResource BogoBody}" />
-                        </VerticalStackLayout>
-                    </Border>
-                </VerticalStackLayout>
-
-                <!-- Validación -->
-                <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceHigh}">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="¿Estás en este punto?" Style="{StaticResource BogoLabel}" FontSize="14" />
-                        <Label Text="Ayuda a otros caminantes a decidir su ruta" Style="{StaticResource BogoBodySm}" />
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button x:Name="ConfirmarBtn" Text="Confirmar estado"
-                                    BackgroundColor="{StaticResource BrandSecondary}" TextColor="White"
-                                    CornerRadius="12" HeightRequest="44" FontSize="13"
-                                    Clicked="OnConfirmarClicked" />
-                            <Button Grid.Column="1" Text="Reportar cambio"
-                                    BackgroundColor="{StaticResource SurfaceLowest}" TextColor="{StaticResource OnSurface}"
-                                    CornerRadius="12" HeightRequest="44" FontSize="13"
-                                    Clicked="OnReportarCambioClicked" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
-</ContentPage>
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BogoMaps.Pages.DetallePuntoPage" Title="Detalle del punto" BackgroundColor="{StaticResource Surface}">
+<ScrollView><VerticalStackLayout Padding="16" Spacing="20">
+<Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceHigh}"><VerticalStackLayout Spacing="12">
+<Label x:Name="ReportTitle" Style="{StaticResource BogoH1}" /><Label x:Name="AddressLabel" Style="{StaticResource BogoBody}" /><Label x:Name="StatusLabel" Style="{StaticResource BogoLabel}" />
+<Button x:Name="GuardarBtn" Clicked="OnGuardarClicked" Style="{StaticResource BogoSecondaryButton}" /></VerticalStackLayout></Border>
+<Image x:Name="PhotoImage" HeightRequest="240" Aspect="AspectFit" IsVisible="False" />
+<Label x:Name="DetailsLabel" Style="{StaticResource BogoBodySm}" />
+<Border Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="12"><Label Text="¿Estás en este punto?" Style="{StaticResource BogoH2}" />
+<Label Text="La confirmación se conserva en este dispositivo; no acredita seguridad ni verificación comunitaria." Style="{StaticResource BogoBodySm}" />
+<Button x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
+<Button x:Name="ResolvedBtn" Clicked="OnResolvedClicked" Style="{StaticResource BogoSecondaryButton}" />
+<Button Text="Abrir indicaciones" Clicked="OnDirectionsClicked" Style="{StaticResource BogoSecondaryButton}" />
+<Button Text="Reportar otro punto" Clicked="OnReportarCambioClicked" Style="{StaticResource BogoSecondaryButton}" />
+</VerticalStackLayout></Border></VerticalStackLayout></ScrollView></ContentPage>
