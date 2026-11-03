@@ -1,0 +1,7 @@
+{
+  "indexes": [
+    { "collectionGroup": "bogoReports", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "city", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "bogoReports", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "ownerId", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

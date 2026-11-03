@@ -20,7 +20,7 @@
         <ShellContent Title="Reportar" Icon="tab_reportar.png"
                       ContentTemplate="{DataTemplate pages:ReportarPage}" Route="reportar" />
         <ShellContent Title="Guardados" Icon="tab_guardados.png"
-                      ContentTemplate="{DataTemplate pages:DetallePuntoPage}" Route="guardados" />
+                      ContentTemplate="{DataTemplate pages:GuardadosPage}" Route="guardados" />
         <ShellContent Title="Perfil" Icon="tab_perfil.png"
                       ContentTemplate="{DataTemplate pages:PerfilPage}" Route="perfil" />
     </TabBar>

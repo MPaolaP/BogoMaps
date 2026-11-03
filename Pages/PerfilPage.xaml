@@ -1,105 +1,66 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="BogoMaps.Pages.PerfilPage"
-             Title="Perfil"
-             BackgroundColor="{StaticResource Surface}"
-             Shell.NavBarIsVisible="False">
-
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="20">
-
-            <!-- Cabecera de perfil -->
-            <Border Style="{StaticResource BogoCard}" Padding="24">
-                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                    <Border BackgroundColor="{StaticResource PrimaryFixed}" StrokeThickness="0"
-                            WidthRequest="88" HeightRequest="88" HorizontalOptions="Center">
-                        <Border.StrokeShape><RoundRectangle CornerRadius="44" /></Border.StrokeShape>
-                        <Label Text="VR" FontSize="28" TextColor="{StaticResource BrandPrimaryDark}"
-                               FontFamily="{StaticResource FontBold}"
-                               HorizontalOptions="Center" VerticalOptions="Center" />
-                    </Border>
-                    <Label Text="Valentina Ríos ?" Style="{StaticResource BogoH2}" HorizontalOptions="Center" />
-                    <Label Text="@valentina_camina · Teusaquillo, Bogotá D.C." Style="{StaticResource BogoBodySm}" HorizontalOptions="Center" />
-                    <Label Text="Recorriendo Bogotá a pie. Enfocada en pasos seguros para personas mayores y andenes despejados."
-                           Style="{StaticResource BogoBodySm}" HorizontalTextAlignment="Center" />
-                    <Button Text="Editar perfil" Style="{StaticResource BogoSecondaryButton}" Margin="0,8,0,0" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Impacto -->
-            <VerticalStackLayout Spacing="8">
-                <Label Text="Impacto Ciudadano" Style="{StaticResource BogoH2}" />
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                    <Border Style="{StaticResource BogoCard}">
-                        <VerticalStackLayout HorizontalOptions="Center">
-                            <Label Text="28" Style="{StaticResource BogoH1}" HorizontalOptions="Center" />
-                            <Label Text="Reportes creados" Style="{StaticResource BogoBodySm}" FontSize="11" />
-                        </VerticalStackLayout>
-                    </Border>
-                    <Border Grid.Column="1" Style="{StaticResource BogoCard}">
-                        <VerticalStackLayout HorizontalOptions="Center">
-                            <Label Text="342" Style="{StaticResource BogoH1}" HorizontalOptions="Center" />
-                            <Label Text="Peatones guiados" Style="{StaticResource BogoBodySm}" FontSize="11" />
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
-            </VerticalStackLayout>
-
-            <!-- Pestañas -->
-            <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeThickness="0" Padding="4">
-                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
-                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="4">
-                    <Button x:Name="TabActivos" Text="Activos (12)" FontSize="12" CornerRadius="12"
-                            BackgroundColor="{StaticResource SurfaceLowest}" TextColor="{StaticResource OnSurface}"
-                            Clicked="OnTabClicked" />
-                    <Button Grid.Column="1" x:Name="TabResueltos" Text="Resueltos (16)" FontSize="12" CornerRadius="12"
-                            BackgroundColor="Transparent" TextColor="{StaticResource OnSurfaceVariant}"
-                            Clicked="OnTabClicked" />
-                    <Button Grid.Column="2" x:Name="TabGuardados" Text="Guardados (5)" FontSize="12" CornerRadius="12"
-                            BackgroundColor="Transparent" TextColor="{StaticResource OnSurfaceVariant}"
-                            Clicked="OnTabClicked" />
-                </Grid>
-            </Border>
-
-            <!-- Reportes -->
-            <VerticalStackLayout Spacing="10">
-                <Border Style="{StaticResource BogoCard}">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Falta de luz en Calle 45 con Cra 19" Style="{StaticResource BogoLabel}" FontSize="14" />
-                        <Label Text="Barrio Palermo · Hace 1 día · Alumbrado" Style="{StaticResource BogoBodySm}" />
-                        <Label Text="&#x23F3; En validación por 8 peatones" FontSize="11"
-                               TextColor="{StaticResource OnTertiaryFixed}" FontFamily="{StaticResource FontBold}" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Style="{StaticResource BogoCard}">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Rampa reparada en Cra 11 con 82" Style="{StaticResource BogoLabel}" FontSize="14" />
-                        <Label Text="Zona Rosa · Hace 3 días · Accesibilidad" Style="{StaticResource BogoBodySm}" />
-                        <Label Text="&#x2705; Verificado por la comunidad (24 votos)" FontSize="11"
-                               TextColor="{StaticResource OnSecondaryContainer}" FontFamily="{StaticResource FontBold}" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Style="{StaticResource BogoCard}">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Hueco profundo en andén Calle 63" Style="{StaticResource BogoLabel}" FontSize="14" />
-                        <Label Text="Chapinero Central · Hace 1 semana · Infraestructura" Style="{StaticResource BogoBodySm}" />
-                        <Label Text="&#x1F3DB; Resuelto por IDU / Alcaldía Mayor" FontSize="11"
-                               TextColor="{StaticResource BrandPrimaryDark}" FontFamily="{StaticResource FontBold}" />
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-
-            <!-- Ajustes -->
-            <VerticalStackLayout Spacing="10">
-                <Border Style="{StaticResource BogoCard}" Padding="14">
-                    <VerticalStackLayout>
-                        <Label Text="Configuración de cuenta" Style="{StaticResource BogoLabel}" FontSize="14" />
-                        <Label Text="Notificaciones, privacidad y geolocalización" Style="{StaticResource BogoBodySm}" />
-                    </VerticalStackLayout>
-                </Border>
-                <Button Text="Cerrar sesión" Style="{StaticResource BogoDangerButton}" Clicked="OnCerrarSesionClicked" />
-            </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
-</ContentPage>
+<?xml version="1.0" encoding="utf-8" ?>
+<ui:StitchPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+ xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+ xmlns:ui="clr-namespace:BogoMaps.Controls"
+ xmlns:maps="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+ x:Class="BogoMaps.Pages.PerfilPage" Title="Perfil">
+ <Grid RowDefinitions="62,*,70" BackgroundColor="{StaticResource Surface}">
+  <ui:BrandHeader SectionTitle="Perfil" />
+  <ScrollView Grid.Row="1">
+   <VerticalStackLayout Padding="16" Spacing="22">
+    <Border Style="{StaticResource BogoCard}" Padding="24">
+     <VerticalStackLayout Spacing="12">
+      <Border WidthRequest="92" HeightRequest="92" Stroke="{StaticResource SecondaryContainer}" StrokeThickness="3" StrokeShape="RoundRectangle 46" BackgroundColor="{StaticResource PrimaryFixed}" HorizontalOptions="Center" Padding="0">
+       <Grid><Label x:Name="AvatarInitials" FontSize="28" FontFamily="JakartaBold" TextColor="{StaticResource BrandPrimary}" HorizontalOptions="Center" VerticalOptions="Center" /><Image x:Name="AvatarImage" Aspect="AspectFill" IsVisible="False" /></Grid>
+      </Border>
+      <Label x:Name="NameLabel" Style="{StaticResource BogoH2}" HorizontalTextAlignment="Center" LineBreakMode="WordWrap" />
+      <Label Text="Comunidad caminante · Bogotá D.C." Style="{StaticResource BogoBodySm}" FontSize="11" HorizontalTextAlignment="Center" />
+      <BoxView WidthRequest="26" HeightRequest="4" Color="{StaticResource SecondaryContainer}" HorizontalOptions="Center" />
+      <Label x:Name="BioLabel" Style="{StaticResource BogoBodySm}" HorizontalTextAlignment="Center" Margin="0,4" />
+      <Button ImageSource="ui_edit_blue.png" ContentLayout="Left,8" Text="Editar perfil" Clicked="OnEditClicked" Style="{StaticResource BogoSecondaryButton}" HorizontalOptions="Center" Padding="24,0" />
+      <Button ImageSource="ui_camera_blue.png" ContentLayout="Left,6" Text="Cambiar foto" Clicked="OnAvatarClicked" FontSize="11" BackgroundColor="Transparent" TextColor="{StaticResource BrandPrimary}" HorizontalOptions="Center" />
+     </VerticalStackLayout>
+    </Border>
+    <VerticalStackLayout Spacing="10">
+     <Label Text="Impacto ciudadano" Style="{StaticResource BogoH2}" />
+     <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+      <Border Grid.Column="0" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_flag" Tone="Blue" /><Label x:Name="ReportCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Reportes propios cargados" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+      <Border Grid.Column="1" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_check" Tone="Green" /><Label x:Name="ConfirmationCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Confirmaciones cargadas" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+     </Grid>
+    </VerticalStackLayout>
+    <Border StrokeThickness="0" StrokeShape="RoundRectangle 16" BackgroundColor="{StaticResource SurfaceContainer}" Padding="4">
+     <Grid ColumnDefinitions="*,*,*" ColumnSpacing="3">
+      <Button x:Name="TabActivos" Text="Activos" CommandParameter="Activos" Clicked="OnTabClicked" FontSize="11" CornerRadius="12" Padding="4" />
+      <Button x:Name="TabResueltos" Grid.Column="1" Text="Resueltos" CommandParameter="Resueltos" Clicked="OnTabClicked" FontSize="11" CornerRadius="12" Padding="4" />
+      <Button x:Name="TabGuardados" Grid.Column="2" Text="Guardados" CommandParameter="Guardados" Clicked="OnTabClicked" FontSize="11" CornerRadius="12" Padding="4" />
+     </Grid>
+    </Border>
+    <Label x:Name="ProfileCommunityNotice" Style="{StaticResource BogoBodySm}" FontSize="11" />
+    <Button x:Name="MoreProfileButton" IsVisible="False" Text="Cargar más reportes" Clicked="OnMoreProfileClicked" Style="{StaticResource BogoSecondaryButton}" />
+    <VerticalStackLayout x:Name="ReportList" Spacing="12" />
+    <Label Text="Los reportes privados y de prueba permanecen locales. Los reportes que publiques están disponibles para la comunidad." Style="{StaticResource BogoBodySm}" FontSize="11" />
+    <Border x:Name="LegacyImportPanel" IsVisible="False" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
+     <VerticalStackLayout Spacing="8">
+      <Label Text="Reportes de tu versión anterior" Style="{StaticResource BogoH2}" />
+      <Label Text="Encontramos reportes.json en este dispositivo. Puedes importar sus reportes como privados de esta sesión, sin publicar nada ni reemplazar el original." Style="{StaticResource BogoBodySm}" />
+      <Button Text="Revisar e importar reportes anteriores" Clicked="OnImportLegacyClicked" Style="{StaticResource BogoSecondaryButton}" />
+     </VerticalStackLayout>
+    </Border>
+    <Border x:Name="DemoPanel" IsVisible="False" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
+     <VerticalStackLayout Spacing="10">
+      <Label Text="Pruebas locales · Desarrollo" Style="{StaticResource BogoH2}" />
+      <Label Text="Carga seis ejemplos ficticios para probar mapa, filtros, estados y favoritos. Solo afectan a la cuenta actual o al invitado actual." Style="{StaticResource BogoBodySm}" />
+      <Button Text="Cargar datos de prueba" Clicked="OnLoadSamplesClicked" Style="{StaticResource BogoPrimaryButton}" />
+      <Button Text="Cargar ejemplos originales de Stitch" Clicked="OnLoadOriginalExamplesClicked" Style="{StaticResource BogoSecondaryButton}" />
+      <Button Text="Retirar datos de prueba" Clicked="OnRemoveSamplesClicked" Style="{StaticResource BogoSecondaryButton}" />
+      <Label Text="Archivo local de esta sesión" Style="{StaticResource BogoLabel}" />
+      <Label x:Name="StoragePathLabel" LineBreakMode="CharacterWrap" Style="{StaticResource BogoBodySm}" FontSize="10" />
+      <Button Text="Copiar ruta del archivo" Clicked="OnCopyStoragePathClicked" Style="{StaticResource BogoSecondaryButton}" />
+     </VerticalStackLayout>
+    </Border>
+    <Button Text="Cerrar sesión / salir" Clicked="OnCerrarSesionClicked" Style="{StaticResource BogoDangerButton}" />
+   </VerticalStackLayout>
+  </ScrollView>
+  <ui:BottomNavigation Grid.Row="2" ActiveTab="perfil" />
+ </Grid>
+</ui:StitchPage>

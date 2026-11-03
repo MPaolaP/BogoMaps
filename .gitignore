@@ -485,3 +485,9 @@ $RECYCLE.BIN/
 
 # MCP local config
 .mcp.json
+
+# Local Firebase emulator and rules-test dependencies
+.firebase/
+firestore-debug.log
+firebase-debug.log
+firebase/security-tests/node_modules/
