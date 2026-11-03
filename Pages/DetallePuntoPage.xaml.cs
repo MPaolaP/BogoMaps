@@ -6,22 +6,32 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
 {
     private string? id;
     private PedestrianReport? report;
+    private bool updating;
     public DetallePuntoPage() => InitializeComponent();
     public void ApplyQueryAttributes(IDictionary<string, object> query) => id = query.TryGetValue("id", out var value) ? value.ToString() : null;
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        report = null;
+        PhotoImage.IsVisible = false; PhotoImage.Source = null;
+        NoPhoto.IsVisible = true;
+        ReportTitle.Text = AddressLabel.Text = StatusLabel.Text = DetailsLabel.Text = EvidenceLabel.Text = "";
+        LightingValue.Text = PavementValue.Text = AccessibilityValue.Text = NoiseValue.Text = "…";
+        DetailConnectionNotice.Text = "Cargando reporte…";
+        GuardarBtn.IsEnabled = ConfirmarBtn.IsEnabled = false;
+        ResolvedBtn.IsVisible = false;
         try
         {
-            report = (await LocalRepository.Instance.ReadAsync()).FirstOrDefault(r => r.Id == id);
+            report = await ReportData.Instance.GetAsync(id ?? "");
             if (report == null) { await DisplayAlert("Reporte", "Este reporte no está disponible.", "OK"); await Shell.Current.GoToAsync(".."); return; }
             Render();
         }
-        catch (Exception) { await DisplayAlert("Reporte", "No fue posible cargar el reporte.", "OK"); }
+        catch (Exception ex) { await DisplayAlert("Reporte", ex is CommunityException or FirebaseAuthException ? ex.Message : "No fue posible cargar el reporte.", "OK"); }
     }
     private void Render()
     {
         if (report == null) return;
+        DetailConnectionNotice.Text = report.IsShared ? ReportData.Instance.Notice : "Reporte local de este dispositivo.";
         ReportTitle.Text = report.Description;
         AddressLabel.Text = report.Address;
         StatusLabel.Text = (report.IsDemo ? "EJEMPLO FICTICIO · " : "") + report.Summary;
@@ -34,16 +44,19 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
         ApplyAssessment(AccessibilityBadge, AccessibilityValue, report.Accessibility);
         ApplyAssessment(NoiseBadge, NoiseValue, report.Noise);
         GuardarBtn.ImageSource = report.Saved ? "ui_save_green.png" : "ui_save_blue.png";
-        DetailsLabel.Text = $"Creado: {report.CreatedAt.ToLocalTime():g}\n{(report.Anonymous ? "Anónimo" : "Reporte local")}\nCoordenadas: {report.Latitude:F6}, {report.Longitude:F6}" +
+        DetailsLabel.Text = $"Creado: {report.CreatedAt.ToLocalTime():g}\n{(report.Anonymous ? "Anónimo" : report.IsShared ? "Reporte comunitario" : "Reporte local")}\nCoordenadas: {report.Latitude:F6}, {report.Longitude:F6}" +
             (report.ConfirmedAt.HasValue ? $"\nConfirmado en este dispositivo: {report.ConfirmedAt.Value.ToLocalTime():g}" : "");
+        GuardarBtn.IsEnabled = !updating;
+        ResolvedBtn.IsVisible = !report.IsShared || report.OwnerId == AuthenticationService.Instance.Current?.UserId;
+        ConfirmationInfo.Text = report.IsShared ? "Tu confirmación se registra para tu cuenta. No certifica la seguridad de una ruta." : "La confirmación se conserva en este dispositivo.";
         GuardarBtn.Text = report.Saved ? "Quitar de guardados" : "Guardar punto";
         ConfirmarBtn.IsEnabled = !report.Confirmed;
-        ConfirmarBtn.Text = report.Confirmed ? "Estado confirmado localmente" : "Confirmar estado";
+        ConfirmarBtn.Text = report.Confirmed ? (report.IsShared ? "Confirmado por ti" : "Confirmado localmente") : "Confirmar estado";
         ResolvedBtn.Text = report.Resolved ? "Reabrir reporte" : "Marcar como resuelto";
         PhotoImage.IsVisible = report.Photo != null && File.Exists(report.Photo);
         PhotoImage.Source = PhotoImage.IsVisible ? report.Photo : null;
         NoPhoto.IsVisible = !PhotoImage.IsVisible;
-        EvidenceLabel.Text = PhotoImage.IsVisible ? "Foto adjunta al reporte, visible en la cabecera." : "Este reporte todavía no tiene una foto adjunta.";
+        EvidenceLabel.Text = PhotoImage.IsVisible ? (report.IsShared ? "Foto local del autor. La fotografía no está publicada." : "Foto adjunta al reporte, visible en la cabecera.") : "Este reporte no tiene una foto compartida.";
     }
     private static void ApplyAssessment(Border badge, Label label, string value)
     {
@@ -51,17 +64,18 @@ public partial class DetallePuntoPage : BogoMaps.Controls.StitchPage, IQueryAttr
         badge.BackgroundColor = CivicVisuals.Surface(tone);
         label.TextColor = CivicVisuals.Ink(tone);
     }
-    private async Task UpdateAsync(Action<PedestrianReport> change)
+    private async Task UpdateAsync(string action)
     {
-        if (report == null) return;
-        var previous = System.Text.Json.JsonSerializer.Serialize(report);
-        try { change(report); await LocalRepository.Instance.SaveAsync(report); }
-        catch (Exception) { report = System.Text.Json.JsonSerializer.Deserialize<PedestrianReport>(previous); await DisplayAlert("No se guardó", "Inténtalo de nuevo. El cambio no se ha aplicado.", "OK"); }
-        Render();
+        if (report == null || updating) return;
+        updating = true;
+        Content.IsEnabled = false;
+        try { report = await ReportData.Instance.ChangeAsync(report, action); }
+        catch (Exception ex) { await DisplayAlert("No se confirmó el cambio", ex is CommunityException or FirebaseAuthException or InvalidOperationException ? ex.Message : "No fue posible guardar el cambio. Revisa la conexión.", "OK"); }
+        finally { updating = false; Content.IsEnabled = true; Render(); }
     }
-    private async void OnGuardarClicked(object? sender, EventArgs e) => await UpdateAsync(r => r.Saved = !r.Saved);
-    private async void OnConfirmarClicked(object? sender, EventArgs e) => await UpdateAsync(r => { r.Confirmed = true; r.ConfirmedAt = DateTimeOffset.UtcNow; });
-    private async void OnResolvedClicked(object? sender, EventArgs e) => await UpdateAsync(r => r.Resolved = !r.Resolved);
+    private async void OnGuardarClicked(object? sender, EventArgs e) => await UpdateAsync("save");
+    private async void OnConfirmarClicked(object? sender, EventArgs e) => await UpdateAsync("confirm");
+    private async void OnResolvedClicked(object? sender, EventArgs e) => await UpdateAsync("resolve");
     private async void OnReportarCambioClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//reportar");
     private async void OnViewMapClicked(object? sender, EventArgs e)
     {

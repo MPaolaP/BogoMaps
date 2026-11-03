@@ -3,6 +3,10 @@ namespace BogoMaps.Pages;
 public partial class PerfilPage : BogoMaps.Controls.StitchPage
 {
     private string filter = "Activos";
+    private ReportCursor? nextProfile;
+    private List<BogoMaps.Models.PedestrianReport> profileRows = [];
+    private bool refreshingProfile;
+    private async void OnMoreProfileClicked(object? sender, EventArgs e) => await RefreshAsync(true);
     private bool samplesBusy;
     public PerfilPage()
     {
@@ -12,24 +16,40 @@ public partial class PerfilPage : BogoMaps.Controls.StitchPage
 #endif
     }
     protected override async void OnAppearing() { base.OnAppearing(); await RefreshAsync(); }
-    private async Task RefreshAsync()
+    private async Task RefreshAsync(bool more = false)
     {
+        if (refreshingProfile) return;
+        refreshingProfile = true;
+        var startScope = AuthenticationService.Instance.Current?.UserId;
+        MoreProfileButton.IsEnabled = false;
+        TabActivos.IsEnabled = TabResueltos.IsEnabled = TabGuardados.IsEnabled = false;
+        ReportList.Children.Clear();
+        ReportCount.Text = ConfirmationCount.Text = "…";
+        AvatarImage.IsVisible = false;
+        AvatarInitials.Text = "";
+        ProfileCommunityNotice.Text = "Actualizando reportes…";
         StoragePathLabel.Text = LocalRepository.Instance.StoragePath;
         NameLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("name"), AuthenticationService.Instance.Current?.Email ?? "Caminante");
         BioLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("bio"), "Recorriendo Bogotá a pie.");
         try
         {
-            var reports = await LocalRepository.Instance.ReadAsync();
+            var page = await ReportData.Instance.FeedAsync(more ? nextProfile : null, mine: filter != "Guardados", favorites: filter == "Guardados");
+            profileRows = more ? profileRows.Concat(page.Reports).DistinctBy(r => r.Id).ToList() : page.Reports;
+            nextProfile = page.Next;
+            MoreProfileButton.IsVisible = nextProfile != null;
+            ProfileCommunityNotice.Text = ReportData.Instance.Notice + " Los contadores corresponden a reportes cargados.";
+            var all = await ReportData.Instance.ReadAsync();
+            var reports = all.Where(r => !r.IsShared || r.OwnerId == AuthenticationService.Instance.Current?.UserId).ToList();
             ReportCount.Text = reports.Count.ToString();
-            ConfirmationCount.Text = reports.Count(r => r.Confirmed).ToString();
+            ConfirmationCount.Text = all.Count(r => r.Confirmed).ToString();
             TabActivos.Text = $"Activos ({reports.Count(r => !r.Resolved)})";
             TabResueltos.Text = $"Resueltos ({reports.Count(r => r.Resolved)})";
-            TabGuardados.Text = $"Guardados ({reports.Count(r => r.Saved)})";
+            TabGuardados.Text = $"Guardados ({all.Count(r => r.Saved)})";
             AvatarInitials.Text = string.Concat(NameLabel.Text.Split(new[] { ' ', '@', '.' }, StringSplitOptions.RemoveEmptyEntries).Take(2).Select(word => char.ToUpperInvariant(word[0])));
             var avatar = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("avatar"), "");
             AvatarImage.IsVisible = File.Exists(avatar);
             AvatarImage.Source = AvatarImage.IsVisible ? avatar : null;
-            ReportCards.Fill(ReportList, reports.Where(r => filter == "Guardados" ? r.Saved : r.Resolved == (filter == "Resueltos")));
+            ReportCards.Fill(ReportList, profileRows.Where(r => filter == "Guardados" ? r.Saved : r.Resolved == (filter == "Resueltos")));
             foreach (var button in new[] { TabActivos, TabResueltos, TabGuardados })
             {
                 var selected = (string)button.CommandParameter == filter;
@@ -37,7 +57,17 @@ public partial class PerfilPage : BogoMaps.Controls.StitchPage
                 button.TextColor = (Color)Application.Current.Resources[selected ? "BrandPrimaryDark" : "OnSurfaceVariant"];
             }
         }
-        catch (Exception) { await DisplayAlert("Perfil", "No fue posible leer los reportes locales.", "OK"); }
+        catch (Exception ex) { await DisplayAlert("Perfil", ex is CommunityException or FirebaseAuthException ? ex.Message : "No fue posible actualizar los reportes.", "OK"); }
+        finally
+        {
+            refreshingProfile = false; MoreProfileButton.IsEnabled = true; TabActivos.IsEnabled = TabResueltos.IsEnabled = TabGuardados.IsEnabled = true;
+            if (AuthenticationService.Instance.Current?.UserId != startScope)
+            {
+                ReportList.Children.Clear(); profileRows = []; ReportCount.Text = ConfirmationCount.Text = "0";
+                NameLabel.Text = "Caminante"; BioLabel.Text = ""; AvatarImage.IsVisible = false; AvatarInitials.Text = "";
+                StoragePathLabel.Text = LocalRepository.Instance.StoragePath;
+            }
+        }
     }
     private async void OnEditClicked(object? sender, EventArgs e)
     {
@@ -94,7 +124,7 @@ public partial class PerfilPage : BogoMaps.Controls.StitchPage
     }
     private async void OnCerrarSesionClicked(object? sender, EventArgs e)
     {
-        AuthenticationService.Instance.SignOut();
-        await Shell.Current.GoToAsync("//login");
+        try { await AuthenticationService.Instance.SignOutAsync(); await Shell.Current.GoToAsync("//login"); }
+        catch (Exception) { await DisplayAlert("Cerrar sesión", "No fue posible cerrar la sesión. Inténtalo de nuevo.", "OK"); }
     }
 }

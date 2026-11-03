@@ -47,11 +47,12 @@
        <VerticalStackLayout Spacing="8"><Label Text="Información del reporte" Style="{StaticResource BogoLabel}" /><Label x:Name="DetailsLabel" Style="{StaticResource BogoBodySm}" /></VerticalStackLayout>
       </Border>
       <Label Text="Evidencia del lugar" Style="{StaticResource BogoH2}" />
+      <Label x:Name="DetailConnectionNotice" Style="{StaticResource BogoBodySm}" FontSize="11" />
       <Label x:Name="EvidenceLabel" Style="{StaticResource BogoBodySm}" />
       <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}">
        <VerticalStackLayout Spacing="10">
         <Label Text="¿Estás en este punto?" Style="{StaticResource BogoH2}" />
-        <Label Text="Tu confirmación queda guardada en este dispositivo. No certifica la seguridad de una ruta." Style="{StaticResource BogoBodySm}" />
+        <Label x:Name="ConfirmationInfo" Text="Tu confirmación queda guardada en este dispositivo. No certifica la seguridad de una ruta." Style="{StaticResource BogoBodySm}" />
         <Button ImageSource="ui_check_white.png" ContentLayout="Left,8" x:Name="ConfirmarBtn" Text="Confirmar estado" Clicked="OnConfirmarClicked" Style="{StaticResource BogoPrimaryButton}" />
         <Button x:Name="ResolvedBtn" Clicked="OnResolvedClicked" Style="{StaticResource BogoSecondaryButton}" BackgroundColor="White" />
        </VerticalStackLayout>

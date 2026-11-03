@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
 <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
-<ItemGroup><Compile Include="../Models/PedestrianReport.cs" Link="PedestrianReport.cs" /><Compile Include="../Services/LocalRepository.cs" Link="LocalRepository.cs" /><Compile Include="../Services/FirebaseAuthClient.cs" Link="FirebaseAuthClient.cs" /><Compile Include="../Services/SampleReports.cs" Link="SampleReports.cs" /></ItemGroup>
+<ItemGroup><Compile Include="../Models/PedestrianReport.cs" Link="PedestrianReport.cs" /><Compile Include="../Services/LocalRepository.cs" Link="LocalRepository.cs" /><Compile Include="../Services/FirebaseAuthClient.cs" Link="FirebaseAuthClient.cs" /><Compile Include="../Services/SampleReports.cs" Link="SampleReports.cs" /><Compile Include="../Services/FirestoreReportClient.cs" Link="FirestoreReportClient.cs" /></ItemGroup>
 </Project>

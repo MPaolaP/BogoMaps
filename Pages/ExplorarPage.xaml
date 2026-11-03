@@ -75,8 +75,13 @@
      </VerticalStackLayout>
     </Border>
     <VerticalStackLayout Padding="16,22" Spacing="12">
+     <Label x:Name="CommunityNotice" Text="Tus reportes locales" Style="{StaticResource BogoBodySm}" FontSize="11" />
+     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+      <Button x:Name="RefreshCommunityButton" Text="Actualizar comunidad" Clicked="OnRefreshCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
+      <Button x:Name="MoreCommunityButton" Grid.Column="1" IsVisible="False" Text="Cargar más" Clicked="OnMoreCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
+     </Grid>
      <Label Text="Reportes recientes" Style="{StaticResource BogoH2}" />
-     <Label Text="Tus aportes en este dispositivo · rojo: activo, verde: resuelto" Style="{StaticResource BogoBodySm}" FontSize="11" />
+     <Label Text="Comunidad y aportes locales · rojo: activo, verde: resuelto" Style="{StaticResource BogoBodySm}" FontSize="11" />
      <VerticalStackLayout x:Name="ReportList" Spacing="12" />
      <Label Text="© OpenStreetMap contributors · El mapa requiere conexión" FontSize="10" TextColor="{StaticResource Outline}" />
     </VerticalStackLayout>

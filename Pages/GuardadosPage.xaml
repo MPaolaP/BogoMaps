@@ -9,7 +9,7 @@
   <ScrollView Grid.Row="1"><VerticalStackLayout Padding="16" Spacing="16">
    <Label Text="Mis puntos guardados" Style="{StaticResource BogoH1}" />
    <Label Text="Los lugares que quieres tener a mano para volver a caminar por Bogotá." Style="{StaticResource BogoBodySm}" />
-   <VerticalStackLayout x:Name="ReportList" Spacing="12" />
+   <Label x:Name="SavedNotice" Style="{StaticResource BogoBodySm}" FontSize="11" /><Button x:Name="MoreSavedButton" IsVisible="False" Text="Cargar más" Clicked="OnMoreSavedClicked" Style="{StaticResource BogoSecondaryButton}" /><VerticalStackLayout x:Name="ReportList" Spacing="12" />
   </VerticalStackLayout></ScrollView>
   <ui:BottomNavigation Grid.Row="2" ActiveTab="guardados" />
  </Grid>

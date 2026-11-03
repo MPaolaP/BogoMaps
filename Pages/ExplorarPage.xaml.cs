@@ -17,6 +17,37 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
     private string? selectedId;
     private bool focusRequested;
     private PedestrianReport? selected;
+    private ReportCursor? next;
+    private bool refreshing;
+    private bool scopeInitialized;
+    private string? visibleScope;
+    private async Task RefreshCommunityAsync(bool more)
+    {
+        if (refreshing) return;
+        refreshing = true;
+        var startScope = AuthenticationService.Instance.Current?.UserId;
+        RefreshCommunityButton.IsEnabled = MoreCommunityButton.IsEnabled = false;
+        try
+        {
+            var page = await ReportData.Instance.FeedAsync(more ? next : null);
+            reports = more ? reports.Concat(page.Reports).DistinctBy(r => r.Id).ToList() : page.Reports;
+            next = page.Next;
+            MoreCommunityButton.IsVisible = next != null;
+            CommunityNotice.Text = ReportData.Instance.Notice;
+        }
+        finally
+        {
+            refreshing = false; RefreshCommunityButton.IsEnabled = MoreCommunityButton.IsEnabled = true;
+            if (AuthenticationService.Instance.Current?.UserId != startScope) { reports = []; selectedId = null; next = null; MoreCommunityButton.IsVisible = false; Render(); }
+        }
+    }
+    private async void OnRefreshCommunityClicked(object? sender, EventArgs e) => await RefreshFromButtonAsync(false);
+    private async void OnMoreCommunityClicked(object? sender, EventArgs e) => await RefreshFromButtonAsync(true);
+    private async Task RefreshFromButtonAsync(bool more)
+    {
+        try { await RefreshCommunityAsync(more); Render(); }
+        catch (Exception ex) { await DisplayAlert("Comunidad", ex is CommunityException or FirebaseAuthException ? ex.Message : "No fue posible actualizar. Tus datos locales se conservan.", "OK"); }
+    }
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("reportId", out var value)) { selectedId = value.ToString(); focusRequested = true; }
@@ -42,9 +73,26 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        var scope = AuthenticationService.Instance.Current?.UserId;
+        if (!scopeInitialized || visibleScope != scope)
+        {
+            scopeInitialized = true; visibleScope = scope;
+            reports = []; selectedId = null; focusRequested = false; category = "Todos";
+            UpdateChips(FilterChips.Children.OfType<Border>().First());
+            SearchEntry.Text = "";
+            var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
+            CityMap.Map.Navigator.CenterOnAndZoomTo(new MPoint(center.x, center.y), 20);
+            Render();
+        }
+        CommunityNotice.Text = "Actualizando reportes…";
         try
         {
-            reports = await LocalRepository.Instance.ReadAsync();
+            await RefreshCommunityAsync(false);
+            if (focusRequested && selectedId != null && !reports.Any(r => r.Id == selectedId))
+            {
+                var target = await ReportData.Instance.GetAsync(selectedId);
+                if (target != null) reports.Add(target);
+            }
             if (focusRequested)
             {
                 category = "Todos";
@@ -53,7 +101,7 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
             }
             Render();
         }
-        catch (Exception) { await DisplayAlert("Reportes", "No se pudieron leer los datos locales. No se han reemplazado.", "OK"); }
+        catch (Exception ex) { await DisplayAlert("Reportes", ex is CommunityException or FirebaseAuthException ? ex.Message : "No se pudieron actualizar los reportes. Los datos locales se conservan.", "OK"); }
     }
     private void Render()
     {

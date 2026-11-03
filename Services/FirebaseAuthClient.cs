@@ -3,7 +3,9 @@ using System.Text.Json;
 
 namespace BogoMaps.Services;
 
-public sealed record FirebaseSession(string UserId, string Email, string RefreshToken);
+public sealed record FirebaseSession(string UserId, string Email, string RefreshToken,
+    [property: System.Text.Json.Serialization.JsonIgnore] string IdToken = "",
+    [property: System.Text.Json.Serialization.JsonIgnore] DateTimeOffset ExpiresAt = default);
 
 // Firebase REST validates credentials and Google ID tokens server-side. Never accept decoded JWT claims as a session.
 public sealed class FirebaseAuthClient(HttpClient http, string apiKey)
@@ -37,7 +39,8 @@ public sealed class FirebaseAuthClient(HttpClient http, string apiKey)
         var data = await ReadAsync(response);
         var userId = data.GetProperty("user_id").GetString()!;
         if (userId != previous.UserId) throw new InvalidDataException("La sesión no corresponde a la cuenta guardada.");
-        return previous with { RefreshToken = data.GetProperty("refresh_token").GetString()! };
+        return previous with { RefreshToken = data.GetProperty("refresh_token").GetString()!,
+            IdToken = data.GetProperty("id_token").GetString()!, ExpiresAt = Expiry(data, "expires_in") };
     }
 
     private async Task<JsonElement> PostAsync(string action, object payload)
@@ -84,7 +87,13 @@ public sealed class FirebaseAuthClient(HttpClient http, string apiKey)
     }
 
     private static FirebaseSession Session(JsonElement data) => new(data.GetProperty("localId").GetString()!,
-        data.TryGetProperty("email", out var email) ? email.GetString() ?? "" : "", data.GetProperty("refreshToken").GetString()!);
+        data.TryGetProperty("email", out var email) ? email.GetString() ?? "" : "", data.GetProperty("refreshToken").GetString()!, data.GetProperty("idToken").GetString()!, Expiry(data, "expiresIn"));
+
+    private static DateTimeOffset Expiry(JsonElement data, string field)
+    {
+        var seconds = data.TryGetProperty(field, out var value) && int.TryParse(value.ToString(), out var number) ? number : 3600;
+        return DateTimeOffset.UtcNow.AddSeconds(Math.Clamp(seconds, 1, 86400));
+    }
 
     private static void ValidateEmail(string email)
     {

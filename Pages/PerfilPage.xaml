@@ -24,8 +24,8 @@
     <VerticalStackLayout Spacing="10">
      <Label Text="Impacto ciudadano" Style="{StaticResource BogoH2}" />
      <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-      <Border Grid.Column="0" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_flag" Tone="Blue" /><Label x:Name="ReportCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Reportes creados" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
-      <Border Grid.Column="1" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_check" Tone="Green" /><Label x:Name="ConfirmationCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Confirmaciones locales" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+      <Border Grid.Column="0" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_flag" Tone="Blue" /><Label x:Name="ReportCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Reportes propios cargados" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
+      <Border Grid.Column="1" Style="{StaticResource BogoCard}"><VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_check" Tone="Green" /><Label x:Name="ConfirmationCount" FontFamily="JakartaBold" FontSize="28" TextColor="{StaticResource OnSurface}" /><Label Text="Confirmaciones cargadas" Style="{StaticResource BogoBodySm}" FontSize="11" /></VerticalStackLayout></Border>
      </Grid>
     </VerticalStackLayout>
     <Border StrokeThickness="0" StrokeShape="RoundRectangle 16" BackgroundColor="{StaticResource SurfaceContainer}" Padding="4">
@@ -35,8 +35,10 @@
       <Button x:Name="TabGuardados" Grid.Column="2" Text="Guardados" CommandParameter="Guardados" Clicked="OnTabClicked" FontSize="11" CornerRadius="12" Padding="4" />
      </Grid>
     </Border>
+    <Label x:Name="ProfileCommunityNotice" Style="{StaticResource BogoBodySm}" FontSize="11" />
+    <Button x:Name="MoreProfileButton" IsVisible="False" Text="Cargar más reportes" Clicked="OnMoreProfileClicked" Style="{StaticResource BogoSecondaryButton}" />
     <VerticalStackLayout x:Name="ReportList" Spacing="12" />
-    <Label Text="Tus aportes se conservan en este dispositivo y se separan por cuenta." Style="{StaticResource BogoBodySm}" FontSize="11" />
+    <Label Text="Los reportes privados y de prueba permanecen locales. Los reportes que publiques están disponibles para la comunidad." Style="{StaticResource BogoBodySm}" FontSize="11" />
     <Border x:Name="DemoPanel" IsVisible="False" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
      <VerticalStackLayout Spacing="10">
       <Label Text="Pruebas locales · Desarrollo" Style="{StaticResource BogoH2}" />

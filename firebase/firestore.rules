@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owns(uid) { return signedIn() && request.auth.uid == uid; }
+    function moderator() { return signedIn() && request.auth.token.get('moderator', false) == true; }
+    function validReport(d) {
+      return d.keys().hasAll(['ownerId','city','category','description','address','latitude','longitude','severity','anonymous','resolved','lighting','pavement','accessibility','noise','createdAt','updatedAt'])
+        && d.keys().hasOnly(['ownerId','city','category','description','address','latitude','longitude','severity','anonymous','resolved','lighting','pavement','accessibility','noise','createdAt','updatedAt'])
+        && d.ownerId is string && d.ownerId.size() > 0 && d.ownerId.size() <= 128
+        && d.city == 'bogota'
+        && d.category in ['Aceras','Iluminación','Accesibilidad','Cruces','Obras','Punto seguro']
+        && d.description is string && d.description.size() > 0 && d.description.size() <= 250
+        && d.address is string && d.address.size() > 0 && d.address.size() <= 300
+        && d.latitude is number && d.latitude >= 3.7 && d.latitude <= 4.9
+        && d.longitude is number && d.longitude >= -74.6 && d.longitude <= -73.9
+        && d.severity in ['Bajo','Moderado','Crítico'] && d.anonymous is bool && d.resolved is bool
+        && d.lighting in ['Sin evaluar','Buena','Deficiente','Sin alumbrado']
+        && d.pavement in ['Sin evaluar','Bueno','Deteriorado','Obstruido']
+        && d.accessibility in ['Sin evaluar','Apto','Con barreras','Inaccesible']
+        && d.noise in ['Sin evaluar','Bajo','Medio','Alto']
+        && d.createdAt is timestamp && d.updatedAt is timestamp;
+    }
+    match /bogoReports/{reportId} {
+      allow get: if signedIn();
+      allow list: if signedIn() && request.query.limit != null && request.query.limit <= 50;
+      allow create: if signedIn() && reportId.matches('^[a-f0-9]{32}$')
+        && validReport(request.resource.data) && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.resolved == false
+        && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time;
+      allow update: if (owns(resource.data.ownerId) || moderator()) && validReport(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resolved','updatedAt'])
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /bogoUsers/{uid}/{kind}/{reportId} {
+      function validMarker() {
+        return kind in ['favorites','confirmations']
+          && request.resource.data.keys().hasAll(['reportId','createdAt'])
+          && request.resource.data.keys().hasOnly(['reportId','createdAt'])
+          && request.resource.data.reportId == reportId && request.resource.data.createdAt == request.time
+          && exists(/databases/$(database)/documents/bogoReports/$(reportId));
+      }
+      allow read: if owns(uid) && kind in ['favorites','confirmations'];
+      allow create: if owns(uid) && validMarker();
+      allow update: if owns(uid) && kind == 'favorites' && validMarker();
+      allow delete: if owns(uid) && kind == 'favorites';
+    }
+  }
+}

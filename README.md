@@ -2,11 +2,11 @@
 
 Aplicación nativa .NET MAUI 9 de movilidad peatonal para Bogotá. Conserva la paleta y las fuentes Plus Jakarta Sans/Inter del diseño exportado de Google Stitch.
 
-## Versión local
+## Versión local y reportes compartidos
 
-El acceso invitado permite usar la app sin cuenta. Google en Android y correo/contraseña se verifican con Firebase Authentication. Registro y recuperación usan Firebase; Apple queda pendiente de su configuración independiente. Los reportes siguen siendo locales: autenticarse no publica ni sincroniza información comunitaria.
+El acceso invitado permite usar la app sin cuenta. Google en Android y correo/contraseña se verifican con Firebase Authentication. Registro y recuperación usan Firebase; Apple queda pendiente de su configuración independiente. Los reportes son locales por defecto. Al crear uno puedes activar «Compartir con la comunidad» para guardarlo en Cloud Firestore. Las reglas e índices deben publicarse antes de probarlo con otras cuentas; sigue [la guía de Firestore](docs/FIRESTORE_SETUP.md).
 
-La configuración cliente de Firebase se incluye en `Resources/Raw/firebase-client.json`; contiene identificadores públicos y una API key de cliente, no una cuenta de servicio. No se incluyen secretos OAuth ni claves privadas. Las contraseñas se envían únicamente al endpoint HTTPS de Firebase y no se guardan. SecureStorage conserva el token de renovación para restaurar la sesión. Los reportes y el perfil se separan por UID; los reportes de invitado no se migran ni se comparten automáticamente al acceder con una cuenta.
+La configuración cliente de Firebase se incluye en `Resources/Raw/firebase-client.json`; contiene identificadores públicos y una API key de cliente, no una cuenta de servicio. No se incluyen secretos OAuth ni claves privadas. Las contraseñas se envían únicamente al endpoint HTTPS de Firebase y no se guardan. SecureStorage conserva el token de renovación para restaurar la sesión. Los reportes locales, la copia comunitaria y el perfil se separan por UID; los reportes de invitado no se publican automáticamente al acceder con una cuenta.
 
 - **Explorar:** mapa nativo Mapsui/OpenStreetMap con desplazamiento y zoom; marcadores de reportes, detalle al tocar un marcador, búsqueda por dirección/descripción y filtros por categoría. La búsqueda filtra tus reportes; no consulta un geocodificador.
 - **Reportar:** ubicación GPS con permisos o coordenadas manuales (punto decimal o coma), referencia del lugar, seis categorías, gravedad, descripción y foto desde la galería. Valida una descripción de 1–250 caracteres, dirección y coordenadas dentro del área de Bogotá. El rectángulo de validación es aproximado, no una frontera administrativa.
@@ -38,7 +38,7 @@ Pruebas ejecutables sin frameworks externos: usan el repositorio de persistencia
 
 ## Red y plataformas
 
-El mapa requiere internet hacia `tile.openstreetmap.org`, con atribución OpenStreetMap y User-Agent de la aplicación. Sin red, los reportes y el formulario siguen siendo locales, pero no se garantiza un mapa base disponible. No hay descarga masiva ni mapas offline. El proveedor recibe las solicitudes de teselas del área visualizada. No se necesita clave Google Maps. Google Sign-In en Android requiere Google Play Services y un certificado SHA registrado en Firebase. El resto del acceso usa `identitytoolkit.googleapis.com` y `securetoken.googleapis.com`.
+El mapa requiere internet hacia `tile.openstreetmap.org`, con atribución OpenStreetMap y User-Agent de la aplicación. Sin red, los reportes y el formulario siguen siendo locales, pero no se garantiza un mapa base disponible. No hay descarga masiva ni mapas offline. El proveedor recibe las solicitudes de teselas del área visualizada. No se necesita clave Google Maps. Google Sign-In en Android requiere Google Play Services y un certificado SHA registrado en Firebase. La autenticación usa `identitytoolkit.googleapis.com` y `securetoken.googleapis.com`; la comunidad usa `firestore.googleapis.com`.
 
 Android pide ubicación solo al pulsar GPS/Cerca de mí; las fotos se seleccionan con el selector del sistema. No se necesita permiso de cámara. iOS/MacCatalyst incluyen textos de permiso, pero requieren validación en macOS. Windows requiere validación en Windows.
 
@@ -53,7 +53,7 @@ Android pide ubicación solo al pulsar GPS/Cerca de mí; las fotos se selecciona
 
 La compilación no demuestra que estos flujos de interfaz se hayan ejecutado. No hay emulador/dispositivo conectado en el entorno de implementación.
 
-Una futura fase comunitaria necesita backend, autorización, almacenamiento de fotos y sincronización. La autenticación Firebase no proporciona por sí sola esas capacidades. El modo local no simula esas capacidades.
+La primera conexión comunitaria usa Firestore para texto, favoritos y confirmaciones. Faltan la validación de reglas en emulador/proyecto real, fotografías compartidas, perfiles remotos, consultas geoespaciales y controles de abuso antes de abrirla al público. Consulta [alcance y activación](docs/FIRESTORE_SETUP.md).
 
 ## Composición visual de Stitch
 
@@ -69,7 +69,7 @@ Los iconos se distribuyen como SVG locales y sus versiones rasterizadas las gene
 
 ## Datos de prueba y ubicación de los datos
 
-No se ha configurado una base de datos remota de reportes. Firebase Authentication guarda las cuentas; la app conserva reportes JSON, fotos y preferencias en el dispositivo. Añadir documentos en Firestore no los mostrará en la app: aún no hay integración de reportes con Firestore ni sincronización entre equipos.
+Firebase Authentication guarda las cuentas. Los reportes privados y ejemplos siguen locales; los reportes publicados usan el esquema `bogoReports` de Firestore una vez activadas las reglas e índices de la guía. Añadir documentos arbitrarios en otra colección no los mostrará en la app.
 
 Con `dotnet run --project BogoMaps.csproj -f net9.0-windows10.0.19041.0` se ejecuta normalmente Debug. En **Perfil → Pruebas locales · Desarrollo → Cargar datos de prueba** puedes añadir seis ejemplos de Bogotá. Cubren todas las categorías, tres favoritos, dos resueltos, dos confirmados y distintas valoraciones. Están identificados con `[Prueba]` y no reflejan condiciones reales ni se envían a Firebase. No incluyen fotos; para probar la galería crea un reporte propio con una foto adjunta.
 

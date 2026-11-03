@@ -72,7 +72,22 @@ try
     foreach (var sample in SampleReports.Create()) await store.SaveAsync(sample);
     Check((await store.ReadAsync()).Count == 6, "Every sample must pass normal report validation");
     store.AccountId = null;
+    var remote = Valid(); remote.IsShared = true; remote.OwnerId = "alice";
+    store.AccountId = "user-a";
+    await store.CacheCommunityAsync(new[] { remote });
+    Check((await store.ReadCommunityCacheAsync()).Single().Id == remote.Id, "Community snapshot must persist");
+    store.AccountId = "user-b";
+    Check((await store.ReadCommunityCacheAsync()).Count == 0, "Private community markers must not cross account boundaries");
+    store.AccountId = null;
+    Check((await store.ReadCommunityCacheAsync()).Count == 0, "Guest must not read an authenticated cache");
+    store.AccountId = "user-a";
+    var badCache = Valid(); badCache.IsShared = true; badCache.IsDemo = true; badCache.OwnerId = "alice";
+    var demoCacheRejected = false;
+    try { await store.CacheCommunityAsync(new[] { badCache }); } catch (ArgumentException) { demoCacheRejected = true; }
+    Check(demoCacheRejected && (await store.ReadCommunityCacheAsync()).Count == 1, "Demo cache failure must not alter the community snapshot");
+    store.AccountId = null;
     await AuthClientTests.RunAsync();
+    await FirestoreClientTests.RunAsync();
     var path = Path.Combine(root, "reports-v1.json");
     await File.WriteAllTextAsync(path, "corrupted data");
     var corruptionReported = false;

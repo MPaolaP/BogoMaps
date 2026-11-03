@@ -9,7 +9,7 @@ internal static class AuthClientTests
     {
         var calls = 0;
         var endpoint = "signInWithPassword";
-        var response = "{\"localId\":\"uid-1\",\"email\":\"test@example.com\",\"refreshToken\":\"refresh-test\"}";
+        var response = "{\"localId\":\"uid-1\",\"email\":\"test@example.com\",\"refreshToken\":\"refresh-test\",\"idToken\":\"id-token-test\",\"expiresIn\":\"3600\"}";
         var status = HttpStatusCode.OK;
         var handler = new Handler(async request =>
         {
@@ -26,6 +26,11 @@ internal static class AuthClientTests
         var client = new FirebaseAuthClient(new HttpClient(handler), "public-test-key");
         var session = await client.SignInAsync("test@example.com", "password-test");
         if (session.UserId != "uid-1" || session.RefreshToken != "refresh-test") throw new Exception("Session mapping failed");
+        if (session.IdToken != "id-token-test" || session.ExpiresAt <= DateTimeOffset.UtcNow.AddMinutes(30)) throw new Exception("Missing access token expiry");
+        var persisted = JsonSerializer.Serialize(session);
+        if (persisted.Contains("id-token-test") || persisted.Contains("ExpiresAt")) throw new Exception("Transient ID token leaked to persistence");
+        var restoredMetadata = JsonSerializer.Deserialize<FirebaseSession>(persisted)!;
+        if (restoredMetadata.UserId != session.UserId || restoredMetadata.RefreshToken != session.RefreshToken) throw new Exception("Session metadata cannot be restored");
         endpoint = "signUp";
         await client.SignInAsync("test@example.com", "password-test", true);
         endpoint = "signInWithIdp";
@@ -64,10 +69,10 @@ internal static class AuthClientTests
         await client.ResetAsync("test@example.com");
         endpoint = "/token";
         status = HttpStatusCode.OK;
-        response = "{\"user_id\":\"uid-1\",\"refresh_token\":\"rotated-refresh\"}";
+        response = "{\"user_id\":\"uid-1\",\"refresh_token\":\"rotated-refresh\",\"id_token\":\"renewed-id-token\",\"expires_in\":\"3600\"}";
         var refreshed = await client.RefreshAsync(session);
         if (refreshed.RefreshToken != "rotated-refresh") throw new Exception("Refresh rotation lost");
-        response = "{\"user_id\":\"another-user\",\"refresh_token\":\"rotated-refresh\"}";
+        response = "{\"user_id\":\"another-user\",\"refresh_token\":\"rotated-refresh\",\"id_token\":\"renewed-id-token\",\"expires_in\":\"3600\"}";
         try { await client.RefreshAsync(session); throw new Exception("Mismatched identity accepted"); }
         catch (InvalidDataException) { }
         Console.WriteLine("PASS: Firebase client: sign-in, sign-up, Google token exchange, reset, validation, rejection, refresh rotation and identity mismatch (mock HTTP; no remote accounts created).");

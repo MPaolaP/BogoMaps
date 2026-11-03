@@ -45,7 +45,7 @@
                         Clicked="OnGpsClicked" />
             </VerticalStackLayout>
 
-            <Border Style="{StaticResource BogoCard}" Padding="12,2"><Entry x:Name="AddressEntry" Placeholder="Dirección o referencia del lugar" FontFamily="JakartaRegular" FontSize="13"  TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"/></Border>
+            <Border Style="{StaticResource BogoCard}" Padding="12,2"><Entry x:Name="AddressEntry" MaxLength="300" Placeholder="Dirección o referencia del lugar" FontFamily="JakartaRegular" FontSize="13"  TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"/></Border>
             <VerticalStackLayout Spacing="6"><Button Text="Introducir coordenadas manualmente" Clicked="OnManualLocationClicked" FontSize="11" BackgroundColor="Transparent" TextColor="{StaticResource BrandPrimary}" HorizontalOptions="Start" />
              <Grid x:Name="ManualCoordinates" IsVisible="False" ColumnDefinitions="*,*" ColumnSpacing="8">
               <Entry x:Name="LatitudeEntry" Placeholder="Latitud (4.65)" Keyboard="Numeric"  TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"/>
@@ -147,6 +147,12 @@
                 </Border>
             </VerticalStackLayout>
 
+            <Border Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceLow}">
+             <VerticalStackLayout Spacing="8">
+              <Grid ColumnDefinitions="*,Auto"><Label Text="Compartir con la comunidad" Style="{StaticResource BogoLabel}" VerticalOptions="Center" /><Switch x:Name="CommunitySwitch" Grid.Column="1" OnColor="{StaticResource BrandPrimary}" /></Grid>
+              <Label x:Name="CommunityHint" Text="Inicia sesión para publicar. Puedes guardar este reporte solo en tu dispositivo." Style="{StaticResource BogoBodySm}" FontSize="11" />
+             </VerticalStackLayout>
+            </Border>
             <!-- Anónimo -->
             <Border Style="{StaticResource BogoCard}" Padding="12">
                 <Grid ColumnDefinitions="*,Auto">
@@ -159,9 +165,9 @@
             </Border>
 
             <VerticalStackLayout Spacing="6">
-                <Button x:Name="PublicarBtn" Text="Guardar reporte en mi mapa"
+                <Button x:Name="PublicarBtn" Text="Guardar / publicar reporte"
                         Style="{StaticResource BogoPrimaryButton}" Clicked="OnPublicarClicked" />
-                <Label Text="Modo local: este reporte se guarda únicamente en tu dispositivo."
+                <Label Text="Elige si guardarlo aquí o compartirlo. Los ejemplos de prueba siempre son locales."
                        FontSize="11" HorizontalTextAlignment="Center" Style="{StaticResource BogoBodySm}" />
             </VerticalStackLayout>
         </VerticalStackLayout>

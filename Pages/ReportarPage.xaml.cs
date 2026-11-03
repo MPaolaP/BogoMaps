@@ -13,6 +13,9 @@ public partial class ReportarPage : BogoMaps.Controls.StitchPage
     private string category = "Aceras";
     private string? photo;
     private MemoryLayer? locationPin;
+    private string draftId = Guid.NewGuid().ToString("N");
+    private string? draftAccount;
+    private bool draftInitialized;
     public ReportarPage()
     {
         InitializeComponent();
@@ -31,6 +34,14 @@ public partial class ReportarPage : BogoMaps.Controls.StitchPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        var account = AuthenticationService.Instance.Current?.UserId;
+        if (draftInitialized && account != draftAccount) ClearDraft();
+        draftInitialized = true;
+        draftAccount = account;
+        CommunitySwitch.IsEnabled = account != null;
+        if (account == null) CommunitySwitch.IsToggled = false;
+        CommunityHint.Text = account == null ? "Inicia sesión para publicar. Puedes guardar el reporte en este dispositivo."
+            : "Al activar esta opción, otras cuentas podrán consultar el reporte. La foto se conserva solo en este dispositivo; aún no se comparten fotografías.";
         AuthorLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("name"), AuthenticationService.Instance.Current?.Email ?? "Caminante invitado");
     }
     private void OnAssessmentClicked(object? sender, EventArgs e) => AssessmentPanel.IsVisible = !AssessmentPanel.IsVisible;
@@ -138,27 +149,39 @@ public partial class ReportarPage : BogoMaps.Controls.StitchPage
             if (!double.TryParse(LatitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var latitude) ||
                 !double.TryParse(LongitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var longitude))
                 throw new ArgumentException("Obtén tu ubicación GPS o introduce coordenadas válidas.");
-            var report = new PedestrianReport { Category = category, Description = DescriptionEditor.Text?.Trim() ?? "",
+            var report = new PedestrianReport { Id = draftId, Category = category, Description = DescriptionEditor.Text?.Trim() ?? "",
                 Address = AddressEntry.Text?.Trim() ?? "", Latitude = latitude, Longitude = longitude,
                 Severity = GravedadLabel.Text, Photo = photo, Anonymous = AnonimoSwitch.IsToggled,
                 Lighting = LightingPicker.SelectedItem as string ?? "Sin evaluar", Pavement = PavementPicker.SelectedItem as string ?? "Sin evaluar",
                 Accessibility = AccessibilityPicker.SelectedItem as string ?? "Sin evaluar", Noise = NoisePicker.SelectedItem as string ?? "Sin evaluar" };
             if (string.IsNullOrWhiteSpace(report.Address)) throw new ArgumentException("Escribe una dirección o referencia del lugar.");
-            await LocalRepository.Instance.SaveAsync(report);
-            photo = null;
-            DescriptionEditor.Text = AddressEntry.Text = LatitudeEntry.Text = LongitudeEntry.Text = "";
-            AnonimoSwitch.IsToggled = false;
-            LightingPicker.SelectedIndex = PavementPicker.SelectedIndex = AccessibilityPicker.SelectedIndex = NoisePicker.SelectedIndex = -1;
-            AssessmentPanel.IsVisible = false;
-            PhotoButton.Text = "Adjuntar foto";
-            UbicacionLabel.Text = "Selecciona un punto en Bogotá";
-            PhotoPreview.IsVisible = false;
-            PhotoPreview.Source = null;
-            if (locationPin != null) LocationMap.Map.Layers.Remove(locationPin);
-            await DisplayAlert("Reporte guardado", "Disponible en tu mapa local. No se ha enviado a un servidor.", "OK");
+            var shared = CommunitySwitch.IsToggled;
+            if (shared) await ReportData.Instance.PublishAsync(report);
+            else await LocalRepository.Instance.SaveAsync(report);
+            var message = shared ? ReportData.Instance.Notice : "Guardado en este dispositivo. No se ha enviado a la comunidad.";
+            ClearDraft();
+            await DisplayAlert(shared ? "Reporte publicado" : "Reporte guardado", message, "OK");
             await Shell.Current.GoToAsync("//explorar");
         }
-        catch (Exception ex) { await DisplayAlert("No se guardó el reporte", ex.Message, "OK"); }
+        catch (Exception ex) { await DisplayAlert("No se confirmó el guardado", ex is CommunityException or FirebaseAuthException or ArgumentException or InvalidOperationException ? ex.Message : "No fue posible confirmar el guardado. Conservamos el borrador para que puedas reintentarlo; antes revisa Actualizar comunidad.", "OK"); }
         finally { PublicarBtn.IsEnabled = true; }
     }
+    private void ClearDraft()
+    {
+        draftId = Guid.NewGuid().ToString("N");
+        photo = null;
+        DescriptionEditor.Text = AddressEntry.Text = LatitudeEntry.Text = LongitudeEntry.Text = "";
+        AnonimoSwitch.IsToggled = CommunitySwitch.IsToggled = false;
+        LightingPicker.SelectedIndex = PavementPicker.SelectedIndex = AccessibilityPicker.SelectedIndex = NoisePicker.SelectedIndex = -1;
+        AssessmentPanel.IsVisible = false;
+        PhotoButton.Text = "Adjuntar foto";
+        UbicacionLabel.Text = "Selecciona un punto en Bogotá";
+        PhotoPreview.IsVisible = false;
+        PhotoPreview.Source = null;
+        if (locationPin != null) LocationMap.Map.Layers.Remove(locationPin);
+        ManualCoordinates.IsVisible = false;
+        var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
+        LocationMap.Map.Navigator.CenterOnAndZoomTo(new MPoint(center.x, center.y), 18);
+    }
+
 }

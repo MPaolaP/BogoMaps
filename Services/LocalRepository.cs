@@ -14,6 +14,33 @@ public sealed class LocalRepository
 
     public string StoragePath => PathName;
 
+    public async Task<List<PedestrianReport>> ReadCommunityCacheAsync()
+    {
+        if (AccountId == null) return [];
+        var path = PathName + ".community.json";
+        await gate.WaitAsync();
+        try { return await ReadCoreAsync(path); }
+        finally { gate.Release(); }
+    }
+    public async Task CacheCommunityAsync(IEnumerable<PedestrianReport> incoming)
+    {
+        if (AccountId == null) throw new InvalidOperationException("Inicia sesión para guardar la copia comunitaria.");
+        var path = PathName + ".community.json";
+        await gate.WaitAsync();
+        try
+        {
+            var reports = await ReadCoreAsync(path);
+            foreach (var report in incoming)
+            {
+                if (!report.IsShared || report.IsDemo || string.IsNullOrWhiteSpace(report.OwnerId) || !Guid.TryParseExact(report.Id, "N", out _)) throw new ArgumentException("Solo se admiten reportes comunitarios reales.");
+                var index = reports.FindIndex(r => r.Id == report.Id);
+                if (index < 0) reports.Add(report); else reports[index] = report;
+            }
+            await WriteCoreAsync(path, reports);
+        }
+        finally { gate.Release(); }
+    }
+
     public async Task<int> LoadSamplesAsync()
     {
         var path = PathName;
@@ -68,18 +95,27 @@ public sealed class LocalRepository
             ?? throw new InvalidDataException("No se pudieron leer los reportes locales.");
     }
 
-    public async Task SaveAsync(PedestrianReport report)
+    public static void Validate(PedestrianReport report)
     {
         if (string.IsNullOrWhiteSpace(report.Description) || report.Description.Length > 250)
             throw new ArgumentException("Escribe una descripción de entre 1 y 250 caracteres.");
-        if (string.IsNullOrWhiteSpace(report.Address))
-            throw new ArgumentException("Escribe una dirección o referencia del lugar.");
+        if (string.IsNullOrWhiteSpace(report.Address) || report.Address.Length > 300)
+            throw new ArgumentException("Escribe una dirección o referencia de entre 1 y 300 caracteres.");
         if (!new[] { "Aceras", "Iluminación", "Accesibilidad", "Cruces", "Obras", "Punto seguro" }.Contains(report.Category) ||
             !new[] { "Bajo", "Moderado", "Crítico" }.Contains(report.Severity))
             throw new ArgumentException("Selecciona una categoría y gravedad válidas.");
+        if (!new[] { "Sin evaluar", "Buena", "Deficiente", "Sin alumbrado" }.Contains(report.Lighting) ||
+            !new[] { "Sin evaluar", "Bueno", "Deteriorado", "Obstruido" }.Contains(report.Pavement) ||
+            !new[] { "Sin evaluar", "Apto", "Con barreras", "Inaccesible" }.Contains(report.Accessibility) ||
+            !new[] { "Sin evaluar", "Bajo", "Medio", "Alto" }.Contains(report.Noise))
+            throw new ArgumentException("Selecciona valoraciones válidas para el estado del punto.");
         if (!double.IsFinite(report.Latitude) || !double.IsFinite(report.Longitude) ||
             report.Latitude is < 3.7 or > 4.9 || report.Longitude is < -74.6 or > -73.9)
             throw new ArgumentException("Selecciona una ubicación dentro de Bogotá.");
+    }
+    public async Task SaveAsync(PedestrianReport report)
+    {
+        Validate(report);
         var path = PathName;
         await gate.WaitAsync();
         try

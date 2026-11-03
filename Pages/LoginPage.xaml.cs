@@ -22,7 +22,7 @@ public partial class LoginPage : ContentPage
     private async void OnBackClicked(object? sender, EventArgs e) => await GuestAsync();
     private Task GuestAsync() => RunAsync("Acceso invitado", async () =>
     {
-        AuthenticationService.Instance.SignOut();
+        await AuthenticationService.Instance.SignOutAsync();
         ClaveEntry.Text = "";
         await ExploreAsync();
     });

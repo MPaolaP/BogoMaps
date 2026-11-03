@@ -24,7 +24,7 @@ Configuración Android recibida y contrastada: paquete y SHA-1 coinciden con la 
 
 `Resources/Raw/firebase-client.json` contiene únicamente configuración cliente pública derivada del archivo recibido, no una cuenta de servicio. No necesita `GoogleServicesJson`: la integración no inicializa el SDK nativo Firebase; utiliza sus APIs REST HTTPS. No se guardan contraseñas. SecureStorage guarda el token de renovación y la sesión se valida al restaurarla.
 
-Los datos locales están separados por UID; salir o entrar como invitado cambia al almacenamiento correspondiente. No hay sincronización remota de reportes.
+Los datos locales están separados por UID; salir o entrar como invitado cambia al almacenamiento correspondiente. Los reportes privados permanecen locales; la conexión de los que publiques está descrita en [Activación de Firestore](FIRESTORE_SETUP.md).
 
 ## Prueba con cuentas reales pendiente
 

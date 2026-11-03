@@ -1,0 +1,13 @@
+{
+  "name": "bogomaps-firestore-security-tests",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "cd ../.. && firebase emulators:exec --config firebase.json --project demo-bogomaps --only firestore \"node --test firebase/security-tests/rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "4.0.1",
+    "firebase": "11.10.0",
+    "firebase-tools": "14.7.0"
+  }
+}
