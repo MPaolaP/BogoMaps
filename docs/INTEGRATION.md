@@ -38,15 +38,20 @@ En Debug, **Cargar ejemplos originales de Stitch** permite consultar el catálog
 
 No reemplazar main copiando toda una carpeta ni forzar el push de una rama sobre otra. Usar un PR desde `integration/main-y-funcionalidad` hacia `main` en el repositorio principal.
 
-En una copia cuyo `origin` sea el repositorio principal, primero comprueba `git status` y conserva cualquier cambio local. Para la primera revisión de la rama:
+La rama está publicada en `MPaolaP/BogoMaps`. GitHub rechazó el push directo a `nicoarciniegas/BogoMaps` porque la cuenta conectada MPaolaP no tiene permisos de escritura allí; no se modificó su main. El propietario puede revisar un PR desde la rama publicada o conceder permisos para publicarla también en el principal.
+
+Primero comprueba `git status` y conserva cualquier cambio local. Desde una copia del repositorio principal, añade el repositorio de colaboración (si ya tienes ese remoto, reutilízalo):
 
 ```sh
-git fetch origin
-git switch --track origin/integration/main-y-funcionalidad
+git remote add colaboracion https://github.com/MPaolaP/BogoMaps.git
+git fetch colaboracion
+git switch --track colaboracion/integration/main-y-funcionalidad
 dotnet run --project BogoMaps.csproj -f net9.0-windows10.0.19041.0 -c Debug
 ```
 
-Si esa rama ya existe localmente, usa `git switch integration/main-y-funcionalidad` y `git pull --ff-only`.
+Si esa rama ya existe localmente, usa `git switch integration/main-y-funcionalidad` y `git pull --ff-only` sobre su remoto de seguimiento.
+
+Para proponer el PR: base repository `nicoarciniegas/BogoMaps`, base `main`; head repository `MPaolaP/BogoMaps`, compare `integration/main-y-funcionalidad`. Si GitHub no permite el PR entre esos repositorios, el propietario puede traer esa misma rama con el remoto `colaboracion` y publicarla en el principal para abrir un PR interno. No hace falta reescribir ni copiar el trabajo.
 
 Comprobar en Windows: login/invitado, navegación, mapa al abrir, filtros/zoom, GPS con y sin servicio de dirección, cámara/galería/cancelación, guardado local, datos de prueba e importación si existe un archivo anterior. La comunidad requiere las reglas/índices de Firestore; no se activan por hacer el merge.
 
