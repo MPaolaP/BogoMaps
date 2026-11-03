@@ -5,7 +5,7 @@ namespace BogoMaps.Services;
 public static class ReportCards
 {
     private static Style Style(string name) => (Style)Application.Current!.Resources[name];
-    public static void Fill(VerticalStackLayout container, IEnumerable<PedestrianReport> reports)
+    public static void Fill(VerticalStackLayout container, IEnumerable<PedestrianReport> reports, Func<PedestrianReport, Task>? onSelect = null)
     {
         container.Children.Clear();
         foreach (var report in reports.OrderByDescending(r => r.CreatedAt))
@@ -29,7 +29,11 @@ public static class ReportCards
             var button = new Button { Text = "Ver detalle →", FontFamily = "InterSemiBold", FontSize = 11,
                 HorizontalOptions = LayoutOptions.Start, Padding = new Thickness(12, 0), HeightRequest = 36, MinimumHeightRequest = 36,
                 CornerRadius = 10, TextColor = Color.FromArgb("#004AC6"), BackgroundColor = Color.FromArgb("#EAEDFF") };
-            button.Clicked += async (_, _) => await Shell.Current.GoToAsync($"detalle?id={report.Id}");
+            button.Clicked += async (_, _) =>
+            {
+                if (onSelect != null) await onSelect(report);
+                else await Shell.Current.GoToAsync($"detalle?id={report.Id}");
+            };
             var footer = new Grid { ColumnDefinitions = { new(GridLength.Star), new(GridLength.Auto) }, ColumnSpacing = 6 };
             footer.Add(state); footer.Add(button, 1);
             body.Children.Add(footer);
