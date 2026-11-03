@@ -4,111 +4,108 @@
  xmlns:ui="clr-namespace:BogoMaps.Controls"
  xmlns:maps="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
  x:Class="BogoMaps.Pages.ExplorarPage" Title="Explorar">
- <Grid RowDefinitions="*,70" BackgroundColor="{StaticResource Surface}">
-  <Grid x:Name="MapViewport" IsClippedToBounds="True">
+ <Grid RowDefinitions="62,*,70" BackgroundColor="{StaticResource Surface}">
+  <ui:BrandHeader SectionTitle="Explorar" />
+  <Grid Grid.Row="1">
    <maps:MapControl x:Name="CityMap" />
-     <VerticalStackLayout x:Name="SearchOverlay" ZIndex="1" Padding="12" Spacing="10" VerticalOptions="Start">
-      <Border Style="{StaticResource BogoCard}" Padding="6">
-       <Grid ColumnDefinitions="30,*,Auto" ColumnSpacing="4">
-        <Image Source="ui_search.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
-        <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Buscar calle, barrio o punto…" FontFamily="JakartaRegular" FontSize="12" TextChanged="OnSearchChanged" Completed="OnSearchCompleted" Focused="OnSearchFocused"  TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}"/>
-        <Button Grid.Column="2" ImageSource="ui_location_blue.png" ContentLayout="Left,4" Text="Cerca de mí" FontSize="11" HeightRequest="42" Padding="10,0" CornerRadius="12" BackgroundColor="{StaticResource PrimaryFixed}" TextColor="{StaticResource BrandPrimaryDark}" Clicked="OnNearMeClicked" />
-       </Grid>
-      </Border>
-      <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
-       <HorizontalStackLayout x:Name="FilterChips" Spacing="6">
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" BackgroundColor="{StaticResource BrandPrimary}">
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_compass_white.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Todos" Style="{StaticResource BogoLabel}" TextColor="White" /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_light_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_access_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_path_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Aceras" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_warning_red.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Cruces" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_tools_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Obras" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-        <Border Style="{StaticResource BogoChip}" Padding="12,7" >
-         <HorizontalStackLayout Spacing="6"><Image Source="ui_shield_green.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Punto seguro" Style="{StaticResource BogoLabel}"  /></HorizontalStackLayout>
-         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
-        </Border>
-       </HorizontalStackLayout>
-      </ScrollView>
-     </VerticalStackLayout>
-     <VerticalStackLayout x:Name="MapZoomButtons" ZIndex="1" HorizontalOptions="End" VerticalOptions="End" Padding="0" Margin="12,0,12,124" Spacing="8">
-      <Button Text="+" FontSize="24" WidthRequest="44" HeightRequest="44" Padding="0" BackgroundColor="White" TextColor="{StaticResource OnSurface}" CornerRadius="12" Clicked="OnZoomInClicked" SemanticProperties.Description="Acercar mapa" />
-      <Button Text="−" FontSize="24" WidthRequest="44" HeightRequest="44" Padding="0" BackgroundColor="White" TextColor="{StaticResource OnSurface}" CornerRadius="12" Clicked="OnZoomOutClicked" SemanticProperties.Description="Alejar mapa" />
-     </VerticalStackLayout>
-
-   <Border x:Name="MapAttribution" ZIndex="1" VerticalOptions="End" HorizontalOptions="Start" Margin="10,0,10,124" BackgroundColor="#EFFFFFFF" StrokeThickness="0" Padding="6,3" StrokeShape="RoundRectangle 6">
-    <Label Text="© OpenStreetMap contributors" FontSize="9" TextColor="{StaticResource OnSurfaceVariant}" />
-   </Border>
-   <ui:MapBottomSheet x:Name="ReportSheet" ZIndex="3">
-    <ui:MapBottomSheet.SheetContent>
-     <VerticalStackLayout Padding="16,8,16,24" Spacing="14">
-      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-       <ui:IconBadge x:Name="SelectedIcon" Icon="ui_compass" Tone="Blue" />
-       <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
-        <Border x:Name="SelectedBadge" BackgroundColor="{StaticResource PrimaryFixed}" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start">
-         <Label x:Name="SelectedStatus" Text="TU RED PEATONAL" FontFamily="InterSemiBold" FontSize="10" TextColor="{StaticResource BrandPrimaryDark}" />
-        </Border>
-        <Label x:Name="SelectedUpdated" Text="Bogotá D.C." Style="{StaticResource BogoBodySm}" FontSize="10" />
-       </VerticalStackLayout>
-      </Grid>
-      <Label x:Name="SelectedAddress" Text="Selecciona un punto o explora los reportes cercanos." Style="{StaticResource BogoBodySm}" />
-      <Button x:Name="SelectedAction" Text="Crear un reporte" Clicked="OnSelectedClicked" Style="{StaticResource BogoPrimaryButton}" />
-      <VerticalStackLayout x:Name="ExpandedDetails" IsVisible="False" Spacing="14">
-       <Label Text="Información del punto" Style="{StaticResource BogoH2}" />
-       <Label x:Name="SelectedFullDescription" Style="{StaticResource BogoBody}" />
-       <Image x:Name="SelectedPhoto" Aspect="AspectFill" HeightRequest="180" IsVisible="False" />
-       <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
-        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="12">
-         <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_light" Tone="Amber" WidthRequest="32" HeightRequest="32" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}" FontSize="11" /><Label x:Name="SheetLighting" FontFamily="JakartaBold" FontSize="13" /></VerticalStackLayout>
-        </Border>
-        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="12">
-         <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_tools" Tone="Green" WidthRequest="32" HeightRequest="32" /><Label Text="Pavimento" Style="{StaticResource BogoLabel}" FontSize="11" /><Label x:Name="SheetPavement" FontFamily="JakartaBold" FontSize="13" /></VerticalStackLayout>
-        </Border>
-        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="12">
-         <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_access" Tone="Blue" WidthRequest="32" HeightRequest="32" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" FontSize="11" /><Label x:Name="SheetAccessibility" FontFamily="JakartaBold" FontSize="13" /></VerticalStackLayout>
-        </Border>
-        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource BogoCard}" BackgroundColor="{StaticResource SurfaceContainer}" Padding="12">
-         <VerticalStackLayout Spacing="8"><ui:IconBadge Icon="ui_noise" Tone="Blue" WidthRequest="32" HeightRequest="32" /><Label Text="Tráfico y ruido" Style="{StaticResource BogoLabel}" FontSize="11" /><Label x:Name="SheetNoise" FontFamily="JakartaBold" FontSize="13" /></VerticalStackLayout>
-        </Border>
-       </Grid>
-       <Label x:Name="SheetConnectionNotice" Style="{StaticResource BogoBodySm}" FontSize="11" />
-       <VerticalStackLayout x:Name="SheetActions" Spacing="8">
-        <Button x:Name="SheetSaveButton" Text="Guardar punto" Clicked="OnSheetSaveClicked" Style="{StaticResource BogoSecondaryButton}" />
-        <Button x:Name="SheetConfirmButton" Text="Confirmar estado" Clicked="OnSheetConfirmClicked" Style="{StaticResource BogoPrimaryButton}" />
-        <Button x:Name="SheetResolveButton" Text="Marcar como resuelto" Clicked="OnSheetResolveClicked" Style="{StaticResource BogoSecondaryButton}" />
-       </VerticalStackLayout>
-       <Label Text="Las valoraciones son observaciones de los reportes; no certifican la seguridad de una ruta." Style="{StaticResource BogoBodySm}" FontSize="10" />
-      </VerticalStackLayout>
-     <Label x:Name="CommunityNotice" Text="Tus reportes locales" Style="{StaticResource BogoBodySm}" FontSize="11" />
-     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-      <Button x:Name="RefreshCommunityButton" Text="Actualizar comunidad" Clicked="OnRefreshCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
-      <Button x:Name="MoreCommunityButton" Grid.Column="1" IsVisible="False" Text="Cargar más" Clicked="OnMoreCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
+   <VerticalStackLayout Padding="12" Spacing="10" VerticalOptions="Start">
+    <Border Style="{StaticResource BogoCard}" Padding="6">
+     <Grid ColumnDefinitions="30,*,Auto" ColumnSpacing="4">
+      <Image Source="ui_search.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+      <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Buscar calle, barrio o punto…" FontFamily="JakartaRegular" FontSize="12" TextChanged="OnSearchChanged" TextColor="{StaticResource OnSurface}" PlaceholderColor="{StaticResource Outline}" />
+      <Button Grid.Column="2" ImageSource="ui_location_blue.png" ContentLayout="Left,4" Text="Cerca de mí" FontSize="11" HeightRequest="42" Padding="10,0" CornerRadius="12" BackgroundColor="{StaticResource PrimaryFixed}" TextColor="{StaticResource BrandPrimaryDark}" Clicked="OnNearMeClicked" />
      </Grid>
-     <Label Text="Reportes recientes" Style="{StaticResource BogoH2}" />
-     <Label Text="Azul: bajo · Ámbar: moderado · Rojo: crítico · Verde: resuelto" Style="{StaticResource BogoBodySm}" FontSize="11" />
-     <VerticalStackLayout x:Name="ReportList" Spacing="12" />
-
-     </VerticalStackLayout>
-    </ui:MapBottomSheet.SheetContent>
-   </ui:MapBottomSheet>
+    </Border>
+    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+     <HorizontalStackLayout x:Name="FilterChips" Spacing="6">
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" BackgroundColor="{StaticResource BrandPrimary}">
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_compass_white.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Todos" Style="{StaticResource BogoLabel}" TextColor="White" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_light_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Iluminación" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_access_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Accesibilidad" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_path_blue.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Aceras" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_warning_red.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Cruces" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_tools_amber.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Obras" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+      <Border Style="{StaticResource BogoChip}" Padding="12,7" >
+       <HorizontalStackLayout Spacing="6"><Image Source="ui_shield_green.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" /><Label Text="Punto seguro" Style="{StaticResource BogoLabel}" /></HorizontalStackLayout>
+       <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnChipTapped" /></Border.GestureRecognizers>
+      </Border>
+     </HorizontalStackLayout>
+    </ScrollView>
+   </VerticalStackLayout>
+   <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Center" Padding="12" Spacing="8">
+    <Button Text="+" FontSize="24" WidthRequest="44" HeightRequest="44" Padding="0" BackgroundColor="White" TextColor="{StaticResource OnSurface}" CornerRadius="12" Clicked="OnZoomInClicked" SemanticProperties.Description="Acercar mapa" />
+    <Button Text="−" FontSize="24" WidthRequest="44" HeightRequest="44" Padding="0" BackgroundColor="White" TextColor="{StaticResource OnSurface}" CornerRadius="12" Clicked="OnZoomOutClicked" SemanticProperties.Description="Alejar mapa" />
+   </VerticalStackLayout>
+   <Border x:Name="BottomSheet"
+           HeightRequest="560"
+           WidthRequest="430"
+           HorizontalOptions="Center"
+           VerticalOptions="End"
+           TranslationY="300"
+           BackgroundColor="{StaticResource Surface}"
+           StrokeThickness="0"
+           StrokeShape="RoundRectangle 24,24,0,0"
+           Padding="0"
+           Margin="0,0,0,0">
+    <Border.GestureRecognizers>
+     <PanGestureRecognizer PanUpdated="OnSheetPanUpdated" />
+    </Border.GestureRecognizers>
+    <Grid RowDefinitions="Auto,*">
+     <Border BackgroundColor="Transparent" Padding="0,10,0,8">
+      <Border x:Name="SheetHandle" WidthRequest="48" HeightRequest="4" BackgroundColor="{StaticResource PrimaryFixed}" HorizontalOptions="Center" StrokeThickness="0" StrokeShape="RoundRectangle 2" />
+     </Border>
+     <ScrollView Grid.Row="1">
+      <VerticalStackLayout Spacing="0">
+       <Border Style="{StaticResource BogoCard}" Margin="12,0,12,0" Padding="16" ZIndex="2">
+        <VerticalStackLayout Spacing="10">
+         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+          <ui:IconBadge x:Name="SelectedIcon" Icon="ui_compass" Tone="Blue" />
+          <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+           <Border x:Name="SelectedBadge" BackgroundColor="{StaticResource PrimaryFixed}" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="8,4" HorizontalOptions="Start">
+            <Label x:Name="SelectedStatus" Text="TU RED PEATONAL" FontFamily="InterSemiBold" FontSize="10" TextColor="{StaticResource BrandPrimaryDark}" />
+           </Border>
+           <Label x:Name="SelectedUpdated" Text="Bogotá D.C." Style="{StaticResource BogoBodySm}" FontSize="10" />
+          </VerticalStackLayout>
+         </Grid>
+         <Label x:Name="SelectedTitle" Text="Explora Bogotá a pie" Style="{StaticResource BogoH2}" />
+         <Label x:Name="SelectedAddress" Text="Toca un reporte del mapa para consultar su estado, guardarlo o confirmarlo." Style="{StaticResource BogoBodySm}" />
+         <Image x:Name="SelectedPhoto" Aspect="AspectFill" HeightRequest="130" IsVisible="False" />
+         <Button x:Name="SelectedAction" Text="Crear mi primer reporte" Clicked="OnSelectedClicked" Style="{StaticResource BogoPrimaryButton}" />
+        </VerticalStackLayout>
+       </Border>
+       <VerticalStackLayout Padding="16,22" Spacing="12">
+        <Label x:Name="CommunityNotice" Text="Tus reportes locales" Style="{StaticResource BogoBodySm}" FontSize="11" />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+         <Button x:Name="RefreshCommunityButton" Text="Actualizar comunidad" Clicked="OnRefreshCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
+         <Button x:Name="MoreCommunityButton" Grid.Column="1" IsVisible="False" Text="Cargar más" Clicked="OnMoreCommunityClicked" Style="{StaticResource BogoSecondaryButton}" FontSize="11" />
+        </Grid>
+        <Label Text="Reportes recientes" Style="{StaticResource BogoH2}" />
+        <Label Text="Azul: bajo · Ámbar: moderado · Rojo: crítico · Verde: resuelto" Style="{StaticResource BogoBodySm}" FontSize="11" />
+        <VerticalStackLayout x:Name="ReportList" Spacing="12" />
+        <Label Text="© OpenStreetMap contributors · El mapa requiere conexión" FontSize="10" TextColor="{StaticResource Outline}" />
+       </VerticalStackLayout>
+      </VerticalStackLayout>
+     </ScrollView>
+    </Grid>
+   </Border>
   </Grid>
-  <ui:BottomNavigation Grid.Row="1" ActiveTab="explorar" />
+  <ui:BottomNavigation Grid.Row="2" ActiveTab="explorar" />
  </Grid>
 </ui:StitchPage>

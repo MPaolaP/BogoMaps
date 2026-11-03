@@ -12,6 +12,8 @@ namespace BogoMaps.Pages;
 
 public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttributable
 {
+    private const double SheetPeekHeight = 112;
+    private double sheetPanStartTranslation;
     private List<PedestrianReport> reports = [];
     private string category = "Todos";
     private MemoryLayer? points;
@@ -86,6 +88,26 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
         CenterMap(new MPoint(center.x, center.y), 20);
     }
+
+    private async void OnSheetPanUpdated(object? sender, PanUpdatedEventArgs e)
+    {
+        var collapsedTranslation = Math.Max(0, BottomSheet.Height - SheetPeekHeight);
+        switch (e.StatusType)
+        {
+            case GestureStatus.Started:
+                sheetPanStartTranslation = BottomSheet.TranslationY;
+                break;
+            case GestureStatus.Running:
+                BottomSheet.TranslationY = Math.Clamp(sheetPanStartTranslation + e.TotalY, 0, collapsedTranslation);
+                break;
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                var target = BottomSheet.TranslationY < collapsedTranslation / 2 ? 0 : collapsedTranslation;
+                await BottomSheet.TranslateTo(0, target, 220, Easing.CubicOut);
+                break;
+        }
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
