@@ -11,6 +11,11 @@ internal static class MapSheetLayoutTests
                 throw new Exception("Sheet snap positions leave the viewport or overlap in the wrong order");
             if (layout.Clamp(-500) != layout.Expanded || layout.Clamp(9000) != layout.Peek || !double.IsFinite(layout.Clamp(double.NaN)))
                 throw new Exception("Sheet drag is not bounded");
+            foreach (var top in new[] { layout.Expanded, layout.Half, layout.Peek, (layout.Expanded + layout.Half) / 2 })
+            {
+                if (Math.Abs(top + layout.VisibleHeightAt(top) - layout.Height) > .001)
+                    throw new Exception("The sheet scroll viewport extends below the screen during a drag or at a snap position");
+            }
         }
         var phone = MapSheetLayout.ForHeight(720);
         if (phone.Snap(phone.Peek - 35, -35, MapSheetPosition.Peek) != MapSheetPosition.Half)

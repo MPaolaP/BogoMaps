@@ -24,7 +24,7 @@ public sealed class MapBottomSheet : Grid
     public event EventHandler? PositionChanged;
     public event EventHandler? CoverageChanged;
     public MapSheetPosition Position => position;
-    public double VisibleHeight => layout.Height <= 0 ? 0 : Math.Max(0, layout.Height - sheet.TranslationY);
+    public double VisibleHeight => layout.VisibleHeightAt(sheet.TranslationY);
     public double MapVisibleHeight => Math.Max(0, sheet.TranslationY);
     public string Title { get => title.Text; set => title.Text = value; }
     public string Subtitle { get => subtitle.Text; set => subtitle.Text = value; }
@@ -104,14 +104,19 @@ public sealed class MapBottomSheet : Grid
         };
         header.GestureRecognizers.Add(pointer);
 #endif
-        scroller = new ScrollView { Orientation = ScrollOrientation.Neither };
+        scroller = new ScrollView { Orientation = ScrollOrientation.Vertical, MinimumHeightRequest = 0 };
         var contents = new Grid { RowDefinitions = { new(new GridLength(112)), new(GridLength.Star) } };
         contents.Add(header); contents.Add(scroller, 0, 1);
         sheet = new Border { BackgroundColor = CivicVisuals.Resource("Surface"), StrokeThickness = 0,
             StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(24, 24, 0, 0) },
             VerticalOptions = LayoutOptions.Start, Content = contents,
             Shadow = new Shadow { Brush = new SolidColorBrush(Colors.Black), Opacity = .14f, Radius = 16, Offset = new Point(0, -4) } };
-        sheet.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(TranslationY)) CoverageChanged?.Invoke(this, EventArgs.Empty); };
+        sheet.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName != nameof(TranslationY)) return;
+            FitVisibleArea();
+            CoverageChanged?.Invoke(this, EventArgs.Empty);
+        };
         Children.Add(sheet);
         UpdateHeader();
     }
@@ -127,10 +132,16 @@ public sealed class MapBottomSheet : Grid
 #endif
         layout = MapSheetLayout.ForHeight(height);
         sheet.IsVisible = layout.Height > 0;
-        sheet.HeightRequest = Math.Max(0, layout.Height - layout.Expanded);
         sheet.TranslationY = layout.Top(position);
-        scroller.Orientation = position == MapSheetPosition.Expanded ? ScrollOrientation.Vertical : ScrollOrientation.Neither;
+        FitVisibleArea();
         CoverageChanged?.Invoke(this, EventArgs.Empty);
+    }
+    private void FitVisibleArea()
+    {
+        // Translation does not resize a MAUI view. Bound the actual scroll viewport
+        // to the exposed area so controls remain reachable at intermediate positions.
+        var height = layout.VisibleHeightAt(sheet.TranslationY);
+        if (Math.Abs(sheet.HeightRequest - height) > .1) sheet.HeightRequest = height;
     }
     public async Task MoveToAsync(MapSheetPosition target, bool animate = true)
     {
@@ -141,11 +152,9 @@ public sealed class MapBottomSheet : Grid
         UpdateHeader();
         if (target != MapSheetPosition.Expanded && scroller.Handler != null && scroller.ScrollY > .5)
         {
-            scroller.Orientation = ScrollOrientation.Vertical;
             await scroller.ScrollToAsync(0, 0, false);
         }
         if (version != motionVersion) return;
-        scroller.Orientation = target == MapSheetPosition.Expanded ? ScrollOrientation.Vertical : ScrollOrientation.Neither;
         if (animate && layout.Height > 0) await sheet.TranslateTo(0, layout.Top(target), 210, Easing.CubicOut);
         else sheet.TranslationY = layout.Top(target);
         if (version != motionVersion) return;
@@ -161,7 +170,7 @@ public sealed class MapBottomSheet : Grid
         mouseDragging = false;
 #endif
         sheet.TranslationY = layout.Top(position);
-        scroller.Orientation = position == MapSheetPosition.Expanded ? ScrollOrientation.Vertical : ScrollOrientation.Neither;
+        FitVisibleArea();
     }
     private void BeginDrag()
     {
@@ -171,7 +180,6 @@ public sealed class MapBottomSheet : Grid
         dragStartTop = layout.Clamp(sheet.TranslationY);
         dragStartPosition = position;
         lastDrag = 0;
-        scroller.Orientation = ScrollOrientation.Neither;
     }
     private void Drag(double total)
     {

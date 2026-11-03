@@ -17,6 +17,7 @@ public sealed record MapSheetLayout(double Height, double Expanded, double Half,
     public double Top(MapSheetPosition position) => position switch
     { MapSheetPosition.Expanded => Expanded, MapSheetPosition.Half => Half, _ => Peek };
     public double Clamp(double top) => double.IsFinite(top) ? Math.Clamp(top, Expanded, Peek) : Peek;
+    public double VisibleHeightAt(double top) => Height - Clamp(top);
     public MapSheetPosition Snap(double top, double drag, MapSheetPosition start)
     {
         var target = Enum.GetValues<MapSheetPosition>().MinBy(p => Math.Abs(Top(p) - Clamp(top)));
