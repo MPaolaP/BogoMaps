@@ -86,6 +86,9 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
         CenterMap(new MPoint(center.x, center.y), 20);
     }
+
+
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
