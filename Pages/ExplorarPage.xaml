@@ -1,172 +1,137 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              x:Class="BogoMaps.Pages.ExplorarPage"
              Title="Explorar"
              BackgroundColor="{StaticResource Surface}"
              Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="16">
+    <Grid>
+        <!-- Mapa a pantalla completa (OpenStreetMap vía Mapsui) -->
+        <maps:MapView x:Name="Mapa" BackgroundColor="{StaticResource SurfaceHigh}" />
 
-            <!-- Zona del mapa (placeholder hasta integrar el control de mapa) -->
-            <Grid HeightRequest="420" BackgroundColor="{StaticResource SurfaceHigh}">
-                <Label Text="Mapa de Bogotá"
-                       Style="{StaticResource BogoBodySm}"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-
-                <VerticalStackLayout Padding="12,12,12,0" Spacing="8" VerticalOptions="Start">
-                    <Border Style="{StaticResource BogoCard}" Padding="6">
+        <VerticalStackLayout Padding="12,12,12,0" Spacing="8" VerticalOptions="Start">
+            <Border Style="{StaticResource BogoCard}" Padding="6">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
+                    <Border Grid.Column="0"
+                            BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeThickness="0"
+                            WidthRequest="40" HeightRequest="40">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="16" />
+                            <RoundRectangle CornerRadius="12" />
                         </Border.StrokeShape>
-                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource SurfaceContainer}"
-                                    StrokeThickness="0"
-                                    WidthRequest="40" HeightRequest="40">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="12" />
-                                </Border.StrokeShape>
-                                <Label Text="&#x1F50D;" HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-                            <Entry Grid.Column="1"
-                                   Placeholder="Buscar calle, barrio o punto..."
-                                   FontSize="13"
-                                   TextColor="{StaticResource OnSurface}"
-                                   PlaceholderColor="{StaticResource OnSurfaceVariant}" />
-                            <Button Grid.Column="2"
-                                    Text="Cerca de mí"
-                                    FontSize="11"
-                                    CornerRadius="12"
-                                    HeightRequest="40"
-                                    Padding="12,0"
-                                    BackgroundColor="{StaticResource PrimaryFixed}"
-                                    TextColor="{StaticResource BrandPrimaryDark}"
-                                    Clicked="OnNearMeClicked" />
-                        </Grid>
+                        <Label Text="&#x1F50D;" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
+                    <Entry x:Name="BusquedaEntry"
+                           Grid.Column="1"
+                           Placeholder="Buscar calle, barrio o punto..."
+                           FontSize="13"
+                           TextColor="{StaticResource OnSurface}"
+                           PlaceholderColor="{StaticResource OnSurfaceVariant}"
+                           TextChanged="OnBusquedaChanged" />
+                    <Button Grid.Column="2"
+                            Text="Cerca de mí"
+                            FontSize="11"
+                            CornerRadius="12"
+                            HeightRequest="40"
+                            Padding="12,0"
+                            BackgroundColor="{StaticResource PrimaryFixed}"
+                            TextColor="{StaticResource BrandPrimaryDark}"
+                            Clicked="OnNearMeClicked" />
+                </Grid>
+            </Border>
 
-                    <!-- Chips de filtro -->
-                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
-                        <HorizontalStackLayout Spacing="8">
-                            <Border x:Name="ChipTodos" Style="{StaticResource BogoChip}" BackgroundColor="{StaticResource BrandPrimary}">
-                                <Label Text="Todos (48)" Style="{StaticResource BogoLabel}" TextColor="White" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnChipTapped" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                            <Border Style="{StaticResource BogoChip}">
-                                <Label Text="&#x1F4A1; Iluminación" Style="{StaticResource BogoLabel}" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnChipTapped" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                            <Border Style="{StaticResource BogoChip}">
-                                <Label Text="&#x267F; Accesibilidad" Style="{StaticResource BogoLabel}" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnChipTapped" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                            <Border Style="{StaticResource BogoChip}">
-                                <Label Text="&#x26A0; Aceras" Style="{StaticResource BogoLabel}" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnChipTapped" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                            <Border Style="{StaticResource BogoChip}">
-                                <Label Text="&#x1F6E1; Seguridad" Style="{StaticResource BogoLabel}" />
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnChipTapped" />
-                                </Border.GestureRecognizers>
-                            </Border>
-                        </HorizontalStackLayout>
-                    </ScrollView>
-                </VerticalStackLayout>
-            </Grid>
+            <!-- Chips de filtro -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8">
+                    <Border Style="{StaticResource BogoChip}" BackgroundColor="{StaticResource BrandPrimary}">
+                        <Label x:Name="TodosLabel" Text="Todos" Style="{StaticResource BogoLabel}" TextColor="White" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChipTapped" CommandParameter="Todos" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource BogoChip}">
+                        <Label Text="&#x1F4A1; Iluminación" Style="{StaticResource BogoLabel}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChipTapped" CommandParameter="Iluminacion" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource BogoChip}">
+                        <Label Text="&#x267F; Accesibilidad" Style="{StaticResource BogoLabel}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChipTapped" CommandParameter="Accesibilidad" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource BogoChip}">
+                        <Label Text="&#x26A0; Aceras" Style="{StaticResource BogoLabel}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChipTapped" CommandParameter="Aceras" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Style="{StaticResource BogoChip}">
+                        <Label Text="&#x1F6E1; Seguridad" Style="{StaticResource BogoLabel}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChipTapped" CommandParameter="Seguridad" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
 
-            <VerticalStackLayout Padding="16,0,16,16" Spacing="16">
-
-                <!-- Tarjeta del punto seleccionado -->
-                <Border Style="{StaticResource BogoCard}">
-                    <VerticalStackLayout Spacing="12">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Border BackgroundColor="{StaticResource SecondaryContainer}"
-                                        StrokeThickness="0" Padding="10,2" HorizontalOptions="Start">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="999" />
-                                    </Border.StrokeShape>
-                                    <Label Text="Seguro &amp; Accesible" FontSize="11"
-                                           TextColor="{StaticResource OnSecondaryContainer}"
-                                           FontFamily="{StaticResource FontBold}" />
-                                </Border>
-                                <Label Text="Cruce Carrera 7 con Calle 67" Style="{StaticResource BogoH2}" />
-                                <Label Text="Chapinero Central • Bogotá D.C." Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
-                                <Label Text="&#x2605; 4.8" Style="{StaticResource BogoH2}" />
-                                <Label Text="34 peatones" FontSize="11" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Grid>
-
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <VerticalStackLayout Grid.Column="0">
-                                <Label Text="Iluminación LED" Style="{StaticResource BogoLabel}" />
-                                <Label Text="Visibilidad alta" FontSize="10" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Rampa rebajada" Style="{StaticResource BogoLabel}" />
-                                <Label Text="Paso nivelado 100%" FontSize="10" Style="{StaticResource BogoBodySm}" />
-                            </VerticalStackLayout>
-                        </Grid>
-
-                        <Button Text="Confirmar estado"
-                                Style="{StaticResource BogoPrimaryButton}"
-                                Clicked="OnConfirmClicked" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Reportes recientes -->
+        <!-- Tarjeta del punto seleccionado (aparece al tocar un pin) -->
+        <Border x:Name="TarjetaPunto"
+                IsVisible="False"
+                Style="{StaticResource BogoCard}"
+                Margin="12"
+                VerticalOptions="End">
+            <VerticalStackLayout Spacing="12">
                 <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Reportes recientes en Chapinero" Style="{StaticResource BogoH2}" />
-                    <Label Grid.Column="1" Text="Ver todos" Style="{StaticResource BogoLabel}"
-                           TextColor="{StaticResource BrandPrimary}" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Border x:Name="EstadoBorde"
+                                StrokeThickness="0" Padding="10,2" HorizontalOptions="Start">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="999" />
+                            </Border.StrokeShape>
+                            <Label x:Name="EstadoLabel" FontSize="11"
+                                   FontFamily="{StaticResource FontBold}" />
+                        </Border>
+                        <Label x:Name="TituloLabel" Style="{StaticResource BogoH2}" />
+                        <Label x:Name="UbicacionLabel" Style="{StaticResource BogoBodySm}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                        <Label x:Name="CalificacionLabel" Style="{StaticResource BogoH2}" />
+                        <Label x:Name="ConfirmacionesLabel" FontSize="11" Style="{StaticResource BogoBodySm}" />
+                    </VerticalStackLayout>
                 </Grid>
 
-                <Border Style="{StaticResource BogoCard}" Padding="12">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Border BackgroundColor="{StaticResource ErrorContainer}" StrokeThickness="0"
-                                WidthRequest="40" HeightRequest="40">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12" />
-                            </Border.StrokeShape>
-                            <Label Text="&#x1F6A7;" HorizontalOptions="Center" VerticalOptions="Center" />
-                        </Border>
-                        <VerticalStackLayout Grid.Column="1">
-                            <Label Text="Baldosa suelta con lluvia" Style="{StaticResource BogoLabel}" />
-                            <Label Text="Calle 72 con Cra 11 • Riesgo de tropiezo" Style="{StaticResource BogoBodySm}" LineBreakMode="TailTruncation" />
-                        </VerticalStackLayout>
-                    </Grid>
+                <Border x:Name="FotoBorde" IsVisible="False" StrokeThickness="0" Padding="0" HeightRequest="120">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Image x:Name="FotoImage" Aspect="AspectFill" />
                 </Border>
 
-                <Border Style="{StaticResource BogoCard}" Padding="12">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Border BackgroundColor="{StaticResource SecondaryContainer}" StrokeThickness="0"
-                                WidthRequest="40" HeightRequest="40">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12" />
-                            </Border.StrokeShape>
-                            <Label Text="&#x1F4A1;" HorizontalOptions="Center" VerticalOptions="Center" />
-                        </Border>
-                        <VerticalStackLayout Grid.Column="1">
-                            <Label Text="Luminaria restaurada" Style="{StaticResource BogoLabel}" />
-                            <Label Text="Cra 9 con Calle 69 • Corredor seguro activo" Style="{StaticResource BogoBodySm}" LineBreakMode="TailTruncation" />
-                        </VerticalStackLayout>
-                    </Grid>
-                </Border>
+                <Label x:Name="DescripcionLabel" IsVisible="False" Style="{StaticResource BogoBodySm}" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label x:Name="Detalle1Titulo" Style="{StaticResource BogoLabel}" />
+                        <Label x:Name="Detalle1Valor" FontSize="10" Style="{StaticResource BogoBodySm}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label x:Name="Detalle2Titulo" Style="{StaticResource BogoLabel}" />
+                        <Label x:Name="Detalle2Valor" FontSize="10" Style="{StaticResource BogoBodySm}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Button Text="Confirmar estado"
+                        Style="{StaticResource BogoPrimaryButton}"
+                        Clicked="OnConfirmClicked" />
             </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+        </Border>
+    </Grid>
 </ContentPage>

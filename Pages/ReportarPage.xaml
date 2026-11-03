@@ -31,11 +31,12 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout>
                             <Label Text="Lugar seleccionado" FontSize="11" Style="{StaticResource BogoBodySm}" />
-                            <Label x:Name="UbicacionLabel" Text="Cra 13 con Calle 53, Bogotá" Style="{StaticResource BogoLabel}" />
+                            <Label x:Name="UbicacionLabel" Text="Aún no has elegido una ubicación" Style="{StaticResource BogoLabel}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
-                <Button Text="Usar mi ubicación GPS actual"
+                <Button x:Name="GpsBtn"
+                        Text="Usar mi ubicación GPS actual"
                         Style="{StaticResource BogoSecondaryButton}"
                         TextColor="{StaticResource BrandPrimary}"
                         Clicked="OnGpsClicked" />
@@ -50,27 +51,27 @@
                 <Grid x:Name="CategoriaGrid" ColumnDefinitions="*,*" RowDefinitions="96,96,96" ColumnSpacing="10" RowSpacing="10">
                     <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource BrandPrimary}">
                         <Label Text="&#x1F9F1; Acera rota / Obstáculo" Style="{StaticResource BogoLabel}" TextColor="White" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Aceras" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
                         <Label Text="&#x1F311; Falta de iluminación" Style="{StaticResource BogoLabel}" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Iluminacion" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
                         <Label Text="&#x267F; Rampa bloqueada / Inaccesible" Style="{StaticResource BogoLabel}" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Accesibilidad" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
                         <Label Text="&#x26A0; Cruce peatonal peligroso" Style="{StaticResource BogoLabel}" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Seguridad" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
                         <Label Text="&#x1F6A7; Obra en vía peatonal" Style="{StaticResource BogoLabel}" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Aceras" /></Border.GestureRecognizers>
                     </Border>
                     <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource BogoCard}" Padding="12" BackgroundColor="{StaticResource SurfaceLow}">
                         <Label Text="&#x2705; Punto seguro / Recomendado" Style="{StaticResource BogoLabel}" VerticalOptions="End" />
-                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" /></Border.GestureRecognizers>
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnCategoriaTapped" CommandParameter="Seguro" /></Border.GestureRecognizers>
                     </Border>
                 </Grid>
             </VerticalStackLayout>
@@ -104,7 +105,13 @@
             <!-- Evidencia -->
             <VerticalStackLayout Spacing="8">
                 <Label Text="Evidencia visual" Style="{StaticResource BogoLabel}" FontSize="14" />
-                <Button Text="&#x1F4F7; Tomar foto" Style="{StaticResource BogoSecondaryButton}"
+                <Border x:Name="FotoBorde" IsVisible="False" StrokeThickness="0" Padding="0" HeightRequest="180">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Image x:Name="FotoImage" Aspect="AspectFill" />
+                </Border>
+                <Button x:Name="FotoBtn" Text="&#x1F4F7; Agregar foto" Style="{StaticResource BogoSecondaryButton}"
                         TextColor="{StaticResource BrandPrimary}" Clicked="OnFotoClicked" />
             </VerticalStackLayout>
 
