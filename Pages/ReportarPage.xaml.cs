@@ -1,25 +1,63 @@
-﻿using BogoMaps.Models;
+using BogoMaps.Controls;
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Nts;
+using Mapsui.Projections;
+using BogoMaps.Models;
 using BogoMaps.Services;
-
+using System.Globalization;
 namespace BogoMaps.Pages;
 
-public partial class ReportarPage : ContentPage
+public partial class ReportarPage : BogoMaps.Controls.StitchPage
 {
-    private const string UbicacionVacia = "Aún no has elegido una ubicación";
-
-    // Coinciden con la categoría y la gravedad preseleccionadas en el XAML.
-    private CategoriaPunto _categoria = CategoriaPunto.Aceras;
-    private string _tituloCategoria = "Acera rota / Obstáculo";
-    private GravedadPunto _gravedad = GravedadPunto.Moderado;
-
-    private Location? _ubicacion;
-    private string? _fotoArchivo;
-
+    private string category = "Aceras";
+    private string? photo;
+    private MemoryLayer? locationPin;
+    private string draftId = Guid.NewGuid().ToString("N");
+    private string? draftAccount;
+    private bool draftInitialized;
     public ReportarPage()
     {
         InitializeComponent();
+        LocationMap.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer("BogoMaps/1.0 (pedestrian local map)"));
+        var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
+        LocationMap.Map.Navigator.CenterOnAndZoomTo(new MPoint(center.x, center.y), 18);
+        LocationMap.Map.Tapped += (_, args) =>
+        {
+            var point = SphericalMercator.ToLonLat(args.WorldPosition.X, args.WorldPosition.Y);
+            if (point.lat is < 3.7 or > 4.9 || point.lon is < -74.6 or > -73.9) return;
+            SetLocation(point.lat, point.lon, false);
+            args.Handled = true;
+        };
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        var account = AuthenticationService.Instance.Current?.UserId;
+        if (draftInitialized && account != draftAccount) ClearDraft();
+        draftInitialized = true;
+        draftAccount = account;
+        CommunitySwitch.IsEnabled = account != null;
+        if (account == null) CommunitySwitch.IsToggled = false;
+        CommunityHint.Text = account == null ? "Inicia sesión para publicar. Puedes guardar el reporte en este dispositivo."
+            : "Al activar esta opción, otras cuentas podrán consultar el reporte. La foto se conserva solo en este dispositivo; aún no se comparten fotografías.";
+        AuthorLabel.Text = Preferences.Default.Get(AuthenticationService.Instance.ProfileKey("name"), AuthenticationService.Instance.Current?.Email ?? "Caminante invitado");
+    }
+    private void OnAssessmentClicked(object? sender, EventArgs e) => AssessmentPanel.IsVisible = !AssessmentPanel.IsVisible;
+    private void OnManualLocationClicked(object? sender, EventArgs e) => ManualCoordinates.IsVisible = !ManualCoordinates.IsVisible;
+    private void SetLocation(double latitude, double longitude, bool center)
+    {
+        LatitudeEntry.Text = latitude.ToString(CultureInfo.InvariantCulture);
+        LongitudeEntry.Text = longitude.ToString(CultureInfo.InvariantCulture);
+        UbicacionLabel.Text = $"Bogotá · {latitude:F5}, {longitude:F5}";
+        var point = SphericalMercator.FromLonLat(longitude, latitude);
+        if (locationPin != null) LocationMap.Map.Layers.Remove(locationPin);
+        locationPin = new MemoryLayer { Features = new[] { new GeometryFeature { Geometry = new NetTopologySuite.Geometries.Point(point.x, point.y), Styles = { new Mapsui.Styles.SymbolStyle { Fill = new Mapsui.Styles.Brush(Mapsui.Styles.Color.Blue), SymbolScale = .8 } } } } };
+        LocationMap.Map.Layers.Add(locationPin);
+        if (center) LocationMap.Map.Navigator.CenterOnAndZoomTo(new MPoint(point.x, point.y), 4);
+        LocationMap.Map.Refresh();
+    }
     private static Color Res(string key) => (Color)Application.Current!.Resources[key];
 
     private void OnCategoriaTapped(object? sender, TappedEventArgs e)
@@ -27,44 +65,26 @@ public partial class ReportarPage : ContentPage
         if (sender is not Border tapped)
             return;
 
+        category = new[] { "Aceras", "Iluminación", "Accesibilidad", "Cruces", "Obras", "Punto seguro" }[CategoriaGrid.Children.IndexOf(tapped)];
         foreach (var child in CategoriaGrid.Children.OfType<Border>())
         {
             var selected = child == tapped;
             child.BackgroundColor = Res(selected ? "BrandPrimary" : "SurfaceLow");
-            if (child.Content is Label label)
-                label.TextColor = selected ? Colors.White : Res("OnSurface");
+            if (child.Content is Grid content)
+            {
+                foreach (var label in content.Children.OfType<Label>()) label.TextColor = selected ? Colors.White : Res("OnSurface");
+                var index = CategoriaGrid.Children.IndexOf(child);
+                var appearance = CivicVisuals.Category(new[] { "Aceras", "Iluminación", "Accesibilidad", "Cruces", "Obras", "Punto seguro" }[index]);
+                foreach (var image in content.Children.OfType<Image>()) image.Source = selected ? $"{appearance.Icon}_white.png" : CivicVisuals.IconSource(appearance.Icon, appearance.Tone);
+            }
         }
-
-        // "Seguro" es un punto recomendado: va en Seguridad y no tiene sentido con gravedad alta.
-        var parametro = e.Parameter as string;
-        if (parametro == "Seguro")
-        {
-            _categoria = CategoriaPunto.Seguridad;
-            AplicarGravedad(GravedadPunto.Bajo);
-        }
-        else if (Enum.TryParse<CategoriaPunto>(parametro, out var categoria))
-        {
-            _categoria = categoria;
-        }
-
-        // El texto de la tarjeta lleva un emoji y un espacio antes del nombre.
-        if ((tapped.Content as Label)?.Text is { } texto)
-            _tituloCategoria = texto[(texto.IndexOf(' ') + 1)..];
+        if (category == "Punto seguro") OnGravedadClicked(BtnBajo, EventArgs.Empty);
     }
 
     private void OnGravedadClicked(object? sender, EventArgs e)
     {
-        if (sender == BtnBajo)
-            AplicarGravedad(GravedadPunto.Bajo);
-        else if (sender == BtnModerado)
-            AplicarGravedad(GravedadPunto.Moderado);
-        else
-            AplicarGravedad(GravedadPunto.Critico);
-    }
-
-    private void AplicarGravedad(GravedadPunto gravedad)
-    {
-        _gravedad = gravedad;
+        if (sender is not Button pressed)
+            return;
 
         foreach (var btn in new[] { BtnBajo, BtnModerado, BtnCritico })
         {
@@ -72,204 +92,123 @@ public partial class ReportarPage : ContentPage
             btn.TextColor = Res("OnSurfaceVariant");
         }
 
-        var (boton, fondo, texto, etiqueta, colorEtiqueta) = gravedad switch
+        if (pressed == BtnBajo)
         {
-            GravedadPunto.Bajo => (BtnBajo, Res("SecondaryContainer"), Res("OnSecondaryContainer"), "Bajo", Res("BrandSecondary")),
-            GravedadPunto.Moderado => (BtnModerado, Res("TertiaryFixed"), Res("OnTertiaryFixed"), "Moderado", Res("TertiaryContainer")),
-            _ => (BtnCritico, Res("ErrorContainer"), Res("OnErrorContainer"), "Crítico", Res("BrandError"))
-        };
-
-        boton.BackgroundColor = fondo;
-        boton.TextColor = texto;
-        GravedadLabel.Text = etiqueta;
-        GravedadLabel.TextColor = colorEtiqueta;
+            pressed.BackgroundColor = Res("SecondaryContainer");
+            pressed.TextColor = Res("OnSecondaryContainer");
+            GravedadLabel.Text = "Bajo";
+            GravedadLabel.TextColor = Res("BrandSecondary");
+        }
+        else if (pressed == BtnModerado)
+        {
+            pressed.BackgroundColor = Res("TertiaryFixed");
+            pressed.TextColor = Res("OnTertiaryFixed");
+            GravedadLabel.Text = "Moderado";
+            GravedadLabel.TextColor = Res("TertiaryContainer");
+        }
+        else
+        {
+            pressed.BackgroundColor = Res("ErrorContainer");
+            pressed.TextColor = Res("OnErrorContainer");
+            GravedadLabel.Text = "Crítico";
+            GravedadLabel.TextColor = Res("BrandError");
+        }
     }
 
     private async void OnGpsClicked(object? sender, EventArgs e)
     {
-        var textoOriginal = GpsBtn.Text;
-        GpsBtn.IsEnabled = false;
-        GpsBtn.Text = "Obteniendo ubicación...";
-
+        if (!GpsButton.IsEnabled) return;
+        var draft = draftId;
+        var original = GpsButton.Text;
+        GpsButton.IsEnabled = false;
+        GpsButton.Text = "Obteniendo ubicación…";
         try
         {
-            var permiso = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-            if (permiso != PermissionStatus.Granted)
-            {
-                await DisplayAlert("Ubicación", "Necesitamos tu permiso de ubicación para ubicar el reporte.", "OK");
-                return;
-            }
-
-            var ubicacion = await Geolocation.Default.GetLocationAsync(
-                new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(15)));
-
-            if (ubicacion is null)
-            {
-                await DisplayAlert("Ubicación", "No pudimos obtener tu ubicación. Inténtalo de nuevo.", "OK");
-                return;
-            }
-
-            _ubicacion = ubicacion;
-            UbicacionLabel.Text = await DescribirUbicacionAsync(ubicacion);
+            var location = await DeviceLocation.GetAsync();
+            if (draft != draftId) return;
+            SetLocation(location.Latitude, location.Longitude, true);
+            var address = await DeviceLocation.DescribeAsync(location);
+            if (draft != draftId) return;
+            if (address != null && string.IsNullOrWhiteSpace(AddressEntry.Text)) AddressEntry.Text = address.Length <= 300 ? address : address[..300];
+            if (address != null) UbicacionLabel.Text = address;
         }
-        catch (Exception ex) when (ex is FeatureNotSupportedException or FeatureNotEnabledException or PermissionException)
-        {
-            await DisplayAlert("Ubicación", "La ubicación no está disponible o está desactivada en este dispositivo.", "OK");
-        }
-        finally
-        {
-            GpsBtn.Text = textoOriginal;
-            GpsBtn.IsEnabled = true;
-        }
+        catch (Exception ex) { await DisplayAlert("GPS", ex.Message, "OK"); }
+        finally { GpsButton.Text = original; GpsButton.IsEnabled = true; }
     }
-
-    /// <summary>Intenta convertir las coordenadas en una dirección legible; si no se puede, devuelve las coordenadas.</summary>
-    private static async Task<string> DescribirUbicacionAsync(Location ubicacion)
-    {
-        var coordenadas = $"{ubicacion.Latitude:0.00000}, {ubicacion.Longitude:0.00000}";
-
-        try
-        {
-            var lugares = await Geocoding.Default.GetPlacemarksAsync(ubicacion).WaitAsync(TimeSpan.FromSeconds(5));
-            var lugar = lugares?.FirstOrDefault();
-            if (lugar is null)
-                return coordenadas;
-
-            var partes = new[]
-            {
-                $"{lugar.Thoroughfare} {lugar.SubThoroughfare}".Trim(),
-                lugar.SubLocality ?? lugar.Locality
-            }.Where(s => !string.IsNullOrWhiteSpace(s));
-
-            var direccion = string.Join(", ", partes);
-            return string.IsNullOrWhiteSpace(direccion) ? coordenadas : direccion;
-        }
-        catch (Exception)
-        {
-            // El servicio de direcciones no está disponible en todas las plataformas; las coordenadas bastan.
-            return coordenadas;
-        }
-    }
-
     private async void OnFotoClicked(object? sender, EventArgs e)
     {
-        var opcion = await DisplayActionSheet("Evidencia visual", "Cancelar", null, "Tomar foto", "Elegir de la galería");
-
+        if (!PhotoButton.IsEnabled) return;
+        var draft = draftId;
+        PhotoButton.IsEnabled = false;
         try
         {
-            FileResult? foto;
-            if (opcion == "Tomar foto")
+            var option = await DisplayActionSheet("Evidencia visual", "Cancelar", null, "Tomar foto", "Elegir de la galería");
+            FileResult? file;
+            if (option == "Tomar foto")
             {
-                if (!MediaPicker.Default.IsCaptureSupported)
-                {
-                    await DisplayAlert("Cámara", "Este dispositivo no tiene una cámara disponible. Puedes elegir una foto de la galería.", "OK");
-                    return;
-                }
-
-                foto = await MediaPicker.Default.CapturePhotoAsync();
+                if (!MediaPicker.Default.IsCaptureSupported) { await DisplayAlert("Cámara", "No hay una cámara disponible. Puedes elegir una foto de la galería.", "OK"); return; }
+                file = await MediaPicker.Default.CapturePhotoAsync();
             }
-            else if (opcion == "Elegir de la galería")
-            {
-                foto = await MediaPicker.Default.PickPhotoAsync();
-            }
-            else
-            {
-                return;
-            }
-
-            if (foto is null)
-                return;
-
-            var anterior = _fotoArchivo;
-            _fotoArchivo = await PuntosService.Compartido.GuardarFotoAsync(foto);
-            if (anterior is not null)
-                PuntosService.EliminarFoto(anterior);
-
-            MostrarFoto();
+            else if (option == "Elegir de la galería") file = await MediaPicker.Default.PickPhotoAsync();
+            else return;
+            if (file == null || draft != draftId) return;
+            var destination = Path.Combine(FileSystem.AppDataDirectory, Guid.NewGuid() + Path.GetExtension(file.FileName));
+            using (var input = await file.OpenReadAsync())
+            using (var output = File.Create(destination)) await input.CopyToAsync(output);
+            if (draft != draftId) { File.Delete(destination); return; }
+            var previous = photo;
+            photo = destination;
+            PhotoButton.Text = "Cambiar foto";
+            PhotoPreview.Source = photo;
+            PhotoPreview.IsVisible = true;
+            // Replacing the image is successful even if an old file is temporarily locked by Windows.
+            if (previous != null) try { File.Delete(previous); } catch (IOException) { }
         }
-        catch (PermissionException)
-        {
-            await DisplayAlert("Cámara", "Necesitamos tu permiso para usar la cámara o las fotos.", "OK");
-        }
-        catch (Exception)
-        {
-            await DisplayAlert("Foto", "No pudimos obtener la foto. Inténtalo de nuevo.", "OK");
-        }
+        catch (Exception) { await DisplayAlert("Foto", "No fue posible obtener la foto. Revisa los permisos o elige otra desde la galería.", "OK"); }
+        finally { PhotoButton.IsEnabled = true; }
     }
-
-    private void MostrarFoto()
-    {
-        var hayFoto = _fotoArchivo is not null;
-        FotoBorde.IsVisible = hayFoto;
-        FotoImage.Source = hayFoto ? ImageSource.FromFile(PuntosService.RutaFoto(_fotoArchivo!)) : null;
-        FotoBtn.Text = hayFoto ? "\U0001F4F7 Cambiar foto" : "\U0001F4F7 Agregar foto";
-    }
-
     private async void OnPublicarClicked(object? sender, EventArgs e)
     {
-        if (_ubicacion is null)
-        {
-            await DisplayAlert("Falta la ubicación", "Toca \"Usar mi ubicación GPS actual\" para ubicar el reporte en el mapa.", "OK");
-            return;
-        }
-
+        if (!PublicarBtn.IsEnabled) return;
         PublicarBtn.IsEnabled = false;
-        PublicarBtn.Text = "Publicando reporte...";
-
         try
         {
-            var reporte = new PuntoUrbano
-            {
-                Titulo = _tituloCategoria,
-                Ubicacion = UbicacionLabel.Text,
-                Categoria = _categoria,
-                Gravedad = _gravedad,
-                Latitud = _ubicacion.Latitude,
-                Longitud = _ubicacion.Longitude,
-                Descripcion = DescripcionEditor.Text?.Trim() ?? "",
-                FotoArchivo = _fotoArchivo,
-                FechaReporte = DateTime.UtcNow,
-                Detalles =
-                [
-                    new DetallePunto { Titulo = "Estado", Valor = "Reporte nuevo" },
-                    new DetallePunto { Titulo = "Reportado por", Valor = AnonimoSwitch.IsToggled ? "Anónimo" : "Un vecino" }
-                ]
-            };
-
-            await PuntosService.Compartido.AgregarReporteAsync(reporte);
-
-            PublicarBtn.BackgroundColor = Res("BrandSecondary");
-            PublicarBtn.Text = "¡Reporte Registrado!";
-            await Task.Delay(700);
-
-            ReiniciarFormulario();
-            await Shell.Current.GoToAsync($"//explorar?puntoId={reporte.Id}");
+            if (!double.TryParse(LatitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var latitude) ||
+                !double.TryParse(LongitudeEntry.Text?.Replace(',', '.'), CultureInfo.InvariantCulture, out var longitude))
+                throw new ArgumentException("Obtén tu ubicación GPS o introduce coordenadas válidas.");
+            var report = new PedestrianReport { Id = draftId, Category = category, Description = DescriptionEditor.Text?.Trim() ?? "",
+                Address = AddressEntry.Text?.Trim() ?? "", Latitude = latitude, Longitude = longitude,
+                Severity = GravedadLabel.Text, Photo = photo, Anonymous = AnonimoSwitch.IsToggled,
+                Lighting = LightingPicker.SelectedItem as string ?? "Sin evaluar", Pavement = PavementPicker.SelectedItem as string ?? "Sin evaluar",
+                Accessibility = AccessibilityPicker.SelectedItem as string ?? "Sin evaluar", Noise = NoisePicker.SelectedItem as string ?? "Sin evaluar" };
+            if (string.IsNullOrWhiteSpace(report.Address)) throw new ArgumentException("Escribe una dirección o referencia del lugar.");
+            var shared = CommunitySwitch.IsToggled;
+            if (shared) await ReportData.Instance.PublishAsync(report);
+            else await LocalRepository.Instance.SaveAsync(report);
+            var message = shared ? ReportData.Instance.Notice : "Guardado en este dispositivo. No se ha enviado a la comunidad.";
+            ClearDraft();
+            await DisplayAlert(shared ? "Reporte publicado" : "Reporte guardado", message, "OK");
+            await Shell.Current.GoToAsync("//explorar");
         }
-        catch (Exception)
-        {
-            await DisplayAlert("Reporte", "No pudimos guardar el reporte. Inténtalo de nuevo.", "OK");
-            ReiniciarBotonPublicar();
-        }
+        catch (Exception ex) { await DisplayAlert("No se confirmó el guardado", ex is CommunityException or FirebaseAuthException or ArgumentException or InvalidOperationException ? ex.Message : "No fue posible confirmar el guardado. Conservamos el borrador para que puedas reintentarlo; antes revisa Actualizar comunidad.", "OK"); }
+        finally { PublicarBtn.IsEnabled = true; }
     }
-
-    private void ReiniciarBotonPublicar()
+    private void ClearDraft()
     {
-        PublicarBtn.ClearValue(Button.BackgroundColorProperty);
-        PublicarBtn.Text = "Publicar Reporte en el Mapa";
-        PublicarBtn.IsEnabled = true;
+        draftId = Guid.NewGuid().ToString("N");
+        photo = null;
+        DescriptionEditor.Text = AddressEntry.Text = LatitudeEntry.Text = LongitudeEntry.Text = "";
+        AnonimoSwitch.IsToggled = CommunitySwitch.IsToggled = false;
+        LightingPicker.SelectedIndex = PavementPicker.SelectedIndex = AccessibilityPicker.SelectedIndex = NoisePicker.SelectedIndex = -1;
+        AssessmentPanel.IsVisible = false;
+        PhotoButton.Text = "Tomar o adjuntar foto";
+        UbicacionLabel.Text = "Selecciona un punto en Bogotá";
+        PhotoPreview.IsVisible = false;
+        PhotoPreview.Source = null;
+        if (locationPin != null) LocationMap.Map.Layers.Remove(locationPin);
+        ManualCoordinates.IsVisible = false;
+        var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
+        LocationMap.Map.Navigator.CenterOnAndZoomTo(new MPoint(center.x, center.y), 18);
     }
 
-    private void ReiniciarFormulario()
-    {
-        _ubicacion = null;
-        UbicacionLabel.Text = UbicacionVacia;
-
-        // La foto ya quedó asociada al reporte publicado, así que no se borra.
-        _fotoArchivo = null;
-        MostrarFoto();
-
-        DescripcionEditor.Text = "";
-        AnonimoSwitch.IsToggled = false;
-        ReiniciarBotonPublicar();
-    }
 }

@@ -13,8 +13,10 @@ internal partial class PuntosJsonContext : JsonSerializerContext
 /// <summary>
 /// Origen de los puntos urbanos. Combina los datos de ejemplo (Resources/Raw/puntos.json) con los
 /// reportes creados en el dispositivo (reportes.json y fotos/ en la carpeta de datos de la app);
-/// cuando exista backend solo cambia esta clase.
+/// Conservado para compatibilidad con el esquema de la rama principal anterior.
+/// Las pantallas integradas usan ReportData/LocalRepository; LegacyReportImport convierte los archivos anteriores.
 /// </summary>
+[Obsolete("Usa ReportData/LocalRepository para funciones nuevas y LegacyReportImport para importar reportes.json.")]
 public class PuntosService
 {
     // Los ids de los reportes del usuario empiezan aquí para no chocar con los de ejemplo.
