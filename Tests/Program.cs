@@ -86,6 +86,7 @@ try
     try { await store.CacheCommunityAsync(new[] { badCache }); } catch (ArgumentException) { demoCacheRejected = true; }
     Check(demoCacheRejected && (await store.ReadCommunityCacheAsync()).Count == 1, "Demo cache failure must not alter the community snapshot");
     store.AccountId = null;
+    MapSheetLayoutTests.Run();
     await LegacyImportTests.RunAsync(root);
     await AuthClientTests.RunAsync();
     await FirestoreClientTests.RunAsync();

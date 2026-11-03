@@ -27,6 +27,8 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
     private bool refreshing;
     private bool scopeInitialized;
     private string? visibleScope;
+    private int selectionVersion;
+    private bool updatingSelection;
     private async Task RefreshCommunityAsync(bool more)
     {
         if (refreshing) return;
@@ -62,8 +64,14 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
     {
         InitializeComponent();
         CityMap.SizeChanged += (_, _) => ApplyPendingCenter();
+        ReportSheet.CoverageChanged += (_, _) => UpdateMapOverlays();
+        ReportSheet.PositionChanged += async (_, _) =>
+        {
+            UpdateSheetDetails();
+            if (ReportSheet.Position == MapSheetPosition.Expanded) await ReloadSelectedAsync();
+        };
         CityMap.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer("BogoMaps/1.0 (pedestrian local map)"));
-        CityMap.Map.Tapped += (_, args) =>
+        CityMap.Map.Tapped += async (_, args) =>
         {
             if (points == null) return;
             var feature = args.GetMapInfo(new[] { points }).Feature;
@@ -72,7 +80,10 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
                 args.Handled = true;
                 selectedId = id;
                 ShowSelected(reports.FirstOrDefault(r => r.Id == id));
+                SearchEntry.Unfocus();
+                await ReportSheet.MoveToAsync(MapSheetPosition.Half);
             }
+            else await ReportSheet.MoveToAsync(MapSheetPosition.Peek);
         };
         var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
         CenterMap(new MPoint(center.x, center.y), 20);
@@ -111,6 +122,7 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
             var center = SphericalMercator.FromLonLat(-74.0721, 4.6505);
             CenterMap(new MPoint(center.x, center.y), 20);
             Render();
+            await ReportSheet.MoveToAsync(MapSheetPosition.Peek, false);
         }
         CommunityNotice.Text = "Actualizando reportes…";
         try
@@ -128,15 +140,22 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
                 SearchEntry.Text = "";
             }
             Render();
+            if (ReportSheet.Position == MapSheetPosition.Expanded) await ReloadSelectedAsync();
         }
         catch (Exception ex) { await DisplayAlert("Reportes", ex is CommunityException or FirebaseAuthException ? ex.Message : "No se pudieron actualizar los reportes. Los datos locales se conservan.", "OK"); }
+    }
+    protected override void OnDisappearing()
+    {
+        selectionVersion++;
+        ReportSheet.CancelMotion();
+        base.OnDisappearing();
     }
     private void Render()
     {
         var query = SearchEntry.Text?.Trim() ?? "";
         var filtered = reports.Where(r => (category == "Todos" || r.Category == category) &&
             ($"{r.Address} {r.Description}".Contains(query, StringComparison.OrdinalIgnoreCase))).ToList();
-        ReportCards.Fill(ReportList, filtered);
+        ReportCards.Fill(ReportList, filtered, OnReportChosenAsync);
         ShowSelected(filtered.FirstOrDefault(r => r.Id == selectedId) ?? filtered.OrderByDescending(r => r.CreatedAt).FirstOrDefault());
         if (focusRequested && selected != null)
         {
@@ -157,9 +176,12 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
     }
     private void ShowSelected(PedestrianReport? report)
     {
+        selectionVersion++;
         selected = report;
         selectedId = report?.Id;
-        SelectedTitle.Text = report?.Description ?? "Explora Bogotá a pie";
+        ReportSheet.Title = report?.Description ?? "Explora Bogotá a pie";
+        ReportSheet.Subtitle = report?.Address ?? "Desliza hacia arriba para ver reportes";
+        SelectedFullDescription.Text = report?.Description ?? "";
         SelectedAddress.Text = report?.Address ?? "Todavía no hay reportes en esta selección. Añade un punto para empezar.";
         SelectedStatus.Text = report == null ? "TU RED PEATONAL" : $"{(report.IsDemo ? "PRUEBA · " : "")}{report.Category.ToUpperInvariant()} · {(report.Resolved ? "RESUELTO" : "ACTIVO")}";
         var appearance = report == null ? (Icon: "ui_compass", Tone: CivicTone.Blue) : CivicVisuals.Category(report.Category);
@@ -168,22 +190,115 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
         SelectedBadge.BackgroundColor = CivicVisuals.Surface(stateTone);
         SelectedStatus.TextColor = CivicVisuals.Ink(stateTone);
         SelectedUpdated.Text = report == null ? "Bogotá D.C." : $"Reportado el {report.CreatedAt.ToLocalTime():dd MMM · HH:mm}";
-        SelectedAction.Text = report == null ? "Crear un reporte" : "Ver estado del punto →";
+        SelectedAction.Text = report == null ? "Crear un reporte" : "Más información ↑";
         SelectedPhoto.IsVisible = report?.Photo != null && File.Exists(report.Photo);
         SelectedPhoto.Source = SelectedPhoto.IsVisible ? report!.Photo : null;
+        SheetLighting.Text = report?.Lighting ?? "Sin evaluar";
+        SheetPavement.Text = report?.Pavement ?? "Sin evaluar";
+        SheetAccessibility.Text = report?.Accessibility ?? "Sin evaluar";
+        SheetNoise.Text = report?.Noise ?? "Sin evaluar";
+        foreach (var label in new[] { SheetLighting, SheetPavement, SheetAccessibility, SheetNoise }) label.TextColor = CivicVisuals.Ink(CivicVisuals.Assessment(label.Text));
+        SheetSaveButton.Text = report?.Saved == true ? "Quitar de guardados" : "Guardar punto";
+        SheetSaveButton.ImageSource = report?.Saved == true ? "ui_save_green.png" : "ui_save_blue.png";
+        SheetConfirmButton.Text = report?.Confirmed == true ? "Confirmado por ti" : "Confirmar estado";
+        SheetConfirmButton.IsEnabled = report != null && !report.Confirmed;
+        SheetResolveButton.Text = report?.Resolved == true ? "Reabrir reporte" : "Marcar como resuelto";
+        SheetResolveButton.IsVisible = report != null && (!report.IsShared || report.OwnerId == AuthenticationService.Instance.Current?.UserId);
+        SheetConnectionNotice.Text = report?.IsShared == true ? ReportData.Instance.Notice : "Datos guardados en este dispositivo.";
+        UpdateSheetDetails();
     }
-    private async void OnSelectedClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync(selected == null ? "//reportar" : $"detalle?id={selected.Id}");
+    private void UpdateSheetDetails()
+    {
+        ExpandedDetails.IsVisible = selected != null && ReportSheet.Position == MapSheetPosition.Expanded;
+        SelectedAction.IsVisible = selected == null || ReportSheet.Position != MapSheetPosition.Expanded;
+        SheetActions.IsEnabled = selected != null && !updatingSelection;
+    }
+    private void UpdateMapOverlays()
+    {
+        var available = ReportSheet.MapVisibleHeight;
+        MapAttribution.Margin = new Thickness(10, 0, 10, ReportSheet.VisibleHeight + 8);
+        MapZoomButtons.Margin = new Thickness(12, 0, 12, ReportSheet.VisibleHeight + 34);
+        MapAttribution.IsVisible = available > 145;
+        MapZoomButtons.IsVisible = available > 270;
+        SearchOverlay.IsVisible = available > 135;
+        if (!SearchOverlay.IsVisible && SearchEntry.IsFocused) SearchEntry.Unfocus();
+    }
+    private async void OnSelectedClicked(object? sender, EventArgs e)
+    {
+        if (selected == null) await Shell.Current.GoToAsync("//reportar");
+        else await ReportSheet.MoveToAsync(MapSheetPosition.Expanded);
+    }
+    private async Task OnReportChosenAsync(PedestrianReport report)
+    {
+        ShowSelected(report);
+        var point = SphericalMercator.FromLonLat(report.Longitude, report.Latitude);
+        CenterMap(new MPoint(point.x, point.y), 5);
+        if (ReportSheet.Position == MapSheetPosition.Expanded) await ReloadSelectedAsync();
+        else await ReportSheet.MoveToAsync(MapSheetPosition.Expanded);
+    }
+    private async Task ReloadSelectedAsync()
+    {
+        if (selected == null || updatingSelection) return;
+        var version = selectionVersion;
+        var id = selected.Id;
+        var scope = AuthenticationService.Instance.Current?.UserId;
+        SheetActions.IsEnabled = false;
+        try
+        {
+            var current = await ReportData.Instance.GetAsync(id);
+            if (version != selectionVersion || scope != AuthenticationService.Instance.Current?.UserId) return;
+            if (current == null) { SheetConnectionNotice.Text = "Este reporte ya no está disponible."; return; }
+            var index = reports.FindIndex(r => r.Id == id);
+            if (index >= 0) reports[index] = current;
+            ShowSelected(current);
+        }
+        catch (Exception ex)
+        {
+            if (version == selectionVersion) SheetConnectionNotice.Text = ex is CommunityException or FirebaseAuthException ? ex.Message : "No fue posible actualizar el punto; se muestra la información disponible.";
+        }
+        finally { if (selected?.Id == id) UpdateSheetDetails(); }
+    }
+    private async void OnSheetSaveClicked(object? sender, EventArgs e) => await ChangeSelectionAsync("save");
+    private async void OnSheetConfirmClicked(object? sender, EventArgs e) => await ChangeSelectionAsync("confirm");
+    private async void OnSheetResolveClicked(object? sender, EventArgs e) => await ChangeSelectionAsync("resolve");
+    private async Task ChangeSelectionAsync(string action)
+    {
+        if (selected == null || updatingSelection) return;
+        updatingSelection = true;
+        SheetActions.IsEnabled = false;
+        var id = selected.Id;
+        var scope = AuthenticationService.Instance.Current?.UserId;
+        try
+        {
+            var current = await ReportData.Instance.ChangeAsync(selected, action);
+            if (scope != AuthenticationService.Instance.Current?.UserId) return;
+            var index = reports.FindIndex(r => r.Id == id);
+            if (index >= 0) reports[index] = current;
+            if (selected?.Id == id) { selectedId = id; Render(); SheetConnectionNotice.Text = ReportData.Instance.Notice; }
+        }
+        catch (Exception ex) { await DisplayAlert("No se confirmó el cambio", ex is CommunityException or FirebaseAuthException or InvalidOperationException ? ex.Message : "No fue posible guardar el cambio. Revisa la conexión.", "OK"); }
+        finally { updatingSelection = false; UpdateSheetDetails(); }
+    }
+    private async void OnSearchCompleted(object? sender, EventArgs e)
+    {
+        SearchEntry.Unfocus();
+        await ReportSheet.MoveToAsync(MapSheetPosition.Expanded);
+    }
+    private async void OnSearchFocused(object? sender, FocusEventArgs e)
+    {
+        if (ReportSheet.Position != MapSheetPosition.Peek) await ReportSheet.MoveToAsync(MapSheetPosition.Peek);
+    }
     private void OnZoomInClicked(object? sender, EventArgs e) => CityMap.Map.Navigator.ZoomIn();
     private void OnZoomOutClicked(object? sender, EventArgs e) => CityMap.Map.Navigator.ZoomOut();
     private void OnSearchChanged(object? sender, TextChangedEventArgs e) => Render();
-    private void OnChipTapped(object? sender, TappedEventArgs e)
+    private async void OnChipTapped(object? sender, TappedEventArgs e)
     {
         if (sender is not Border tapped || tapped.Parent is not HorizontalStackLayout row) return;
         var index = row.Children.IndexOf(tapped);
         category = new[] { "Todos", "Iluminación", "Accesibilidad", "Aceras", "Cruces", "Obras", "Punto seguro" }[index];
         UpdateChips(tapped);
         Render();
+        if (ReportSheet.Position == MapSheetPosition.Peek) await ReportSheet.MoveToAsync(MapSheetPosition.Half);
     }
     private void UpdateChips(Border selectedChip)
     {
@@ -235,6 +350,7 @@ public partial class ExplorarPage : BogoMaps.Controls.StitchPage, IQueryAttribut
                 .Where(x => x.Km <= 30).OrderBy(x => x.Km).FirstOrDefault();
             ShowSelected(nearest?.Report);
             CityMap.Map.Refresh();
+            await ReportSheet.MoveToAsync(MapSheetPosition.Half);
         }
         catch (Exception ex) { await DisplayAlert("Ubicación", ex.Message, "OK"); }
     }
